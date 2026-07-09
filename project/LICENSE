@@ -1,0 +1,39 @@
+# License — Source Code (MIT)
+
+## Scope of this license
+
+This MIT License applies **only to the source code committed to this repository** — that is, the software files that make up The Drake Display engine and tooling (for example: `.py`, `.js`, `.jsx`, `.ts`, `.html`, `.css`, and build/configuration files), together with the inline code documentation bundled inside them (docstrings and code comments).
+
+**This license does NOT apply to:**
+
+- **Documentation and research content** (standalone Markdown research documents, specifications, plans, the data-source catalog, glossary, and project-management prose). Those are licensed separately under **Creative Commons Attribution 4.0** — see `LICENSE-CONTENT`.
+- **Creative and narrative fiction** — any story prose, the novel manuscript, its outlines, and narrative worldbuilding text — which is **reserved, All Rights Reserved by the author**, whether or not any fragment appears in this repository. It is not licensed under MIT or CC.
+- **Third-party materials** — astronomical data, catalogs, and external software libraries the project consumes or depends on. These remain governed by **their own original licenses and terms**; nothing here relicenses them.
+- **The project name, branding, and any trademarks.**
+- **Anything not committed to this repository** — including any files on the author's personal devices, private or unpublished drafts, notes, and any material outside this repository. Such material is expressly **not** covered by this license.
+
+Where the standard MIT text below refers to "the Software" and its "associated documentation files," that phrase is to be read as the source code in this repository and its bundled inline documentation only, consistent with the scope above.
+
+---
+
+## MIT License
+
+Copyright (c) 2026 The Drake Display — *&lt;replace with your legal name or preferred attribution&gt;*
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

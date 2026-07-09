@@ -1,0 +1,44 @@
+# License — Documentation & Research Content (CC BY 4.0)
+
+## Scope of this license
+
+This license applies **only to the documentation and research content committed to this repository** — the standalone prose and reference material created for The Drake Display. This includes the research library documents, model specifications, build plans, the data-source catalog, the glossary, project-management documents, and any diagrams or figures created for the project and committed here (typically the `.md` files and accompanying images).
+
+**This license does NOT apply to:**
+
+- **Source code** and its bundled inline documentation, which is licensed separately under the **MIT License** — see `LICENSE`.
+- **Creative and narrative fiction** — any story prose, the novel manuscript, its outlines, and narrative worldbuilding text — which is **reserved, All Rights Reserved by the author**, whether or not any fragment appears in this repository. It is *not* placed under Creative Commons. Sharing the research does not share the story.
+- **Third-party materials** — astronomical data, catalogs, quoted excerpts, and external references. These remain governed by **their own original licenses and terms**. Attribution and citation of third-party sources within these documents do not transfer any rights in those sources.
+- **The project name, branding, and any trademarks.**
+- **Anything not committed to this repository** — including any files on the author's personal devices, private or unpublished drafts, notes, and any material outside this repository. Such material is expressly **not** covered by this license.
+
+## The license
+
+The documentation and research content within the scope above is licensed under the
+
+**Creative Commons Attribution 4.0 International License (CC BY 4.0).**
+
+You are free to:
+
+- **Share** — copy and redistribute the material in any medium or format.
+- **Adapt** — remix, transform, and build upon the material for any purpose, even commercially.
+
+Under the following term:
+
+- **Attribution** — You must give appropriate credit, provide a link to this license, and indicate if changes were made. You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
+
+No additional restrictions — you may not apply legal terms or technological measures that legally restrict others from doing anything the license permits.
+
+The full, authoritative legal text of CC BY 4.0 is incorporated here **by reference** and is available at:
+**<https://creativecommons.org/licenses/by/4.0/legalcode>**
+(A plain-language summary is at <https://creativecommons.org/licenses/by/4.0/>.) In any conflict between this summary and the full legal code, the full legal code governs.
+
+## How to attribute
+
+A suitable attribution for reused content is:
+
+> "The Drake Display" by *&lt;author legal name or preferred attribution&gt;*, used under CC BY 4.0. Source: *&lt;repository URL&gt;*. Changes: *&lt;note any modifications&gt;*.
+
+## Disclaimer
+
+The content is provided "as is," without warranties of any kind. It represents a research and modeling effort that explicitly distinguishes established science from speculation; it is not offered as authoritative scientific, professional, or factual advice.

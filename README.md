@@ -1,16 +1,20 @@
-# The Galactic Habitability Veil
+# The Drake Display
 
-**A four-dimensional model of galactic habitability — mapping where, and *when*, the Milky Way could hold life.**
+**A hazard-aware, four-dimensional extension of the Drake equation — mapping where, and *when*, the Milky Way could hold life.**
 
 ---
+
+The Drake equation asked how many civilizations might share our galaxy. It was a way of turning a dinner-table argument into something you could actually reckon with. The Drake Display picks up where that left off and adds the two dimensions the original equation never had: **space and time.** Not *how many* worlds, but *where* — and *when*.
 
 Imagine a translucent veil draped across the disk of the galaxy. Where conditions favor life, it rises; where a hazard lurks — a massive star spiraling toward collapse, the crowded violence of the core, the metal-starved outer dark — it dips. Overlapping influences compound. And then you reach for a slider marked *time*, and the whole surface begins to move: the habitable galaxy forming, shifting, and reshaping itself across billions of years as heavy elements spread outward and the early universe's gamma-ray storms subside.
 
 That is what this project builds. Not an artist's impression — a **model**, grounded in real astronomical data where it exists, honest speculation where it doesn't, and a clear, visible line between the two.
 
+*(The name is a nod to Frank Drake. The veil is the surface you see; the Display is the instrument that computes it.)*
+
 ## What this is
 
-The Veil has two intertwined tracks, and neither works without the other:
+The Drake Display has two intertwined tracks, and neither works without the other:
 
 - **A modeling engine** — an interactive, rotatable, zoomable 3D map of the Milky Way with a fourth axis, time. Each entity (star, planet, remnant, hazard) is a clickable object; the "veil" is a computed probability field describing habitability at every point, deforming as factors compound and as the clock runs.
 - **A research library** — a growing collection of rigorous, source-cited science documents (stellar physics, galactic chemical evolution, the gamma-ray-burst and supernova hazard census, the bioenergetics of starlight, and more) that supply and justify every coefficient the model uses. The research calibrates the tool; the tool exposes which research still needs doing. One loop, not two projects.
@@ -28,7 +32,7 @@ Habitability is not uniform, and it is not eternal. It has a **geography** and a
 **Intellectual honesty is a first-class feature, not an afterthought.**
 
 - Every equation is rated by certainty — from *Fundamental* physical law down to *Construct* (an explicit modeling choice) and *Missing* (a gap we refuse to paper over).
-- The map is designed to **shade observed regions differently from modeled and speculative ones**. Most of the galaxy's data is inferred or synthetic — because we sit inside the disk, behind dust, unable to photograph our own galaxy from outside — and the Veil shows you exactly where knowledge ends and extrapolation begins. That distinction is the difference between an instrument and a pretty lie.
+- The map is designed to **shade observed regions differently from modeled and speculative ones**. Most of the galaxy's data is inferred or synthetic — because we sit inside the disk, behind dust, unable to photograph our own galaxy from outside — and the Display shows you exactly where knowledge ends and extrapolation begins. That distinction is the difference between an instrument and a pretty lie.
 - Gaps are named, not hidden. The project maintains explicit lists of the equations and parameters we *don't yet have*, each tied to the research that would supply it.
 
 ## The science it stands on
@@ -46,6 +50,7 @@ The repository is organized as layers that build on one another:
 - **Research library** — the science documents that justify the model.
 - **Model-definition layer** — the formal specification: the entity schema (`entity.md`), the equation set with certainty ratings (`equations.md`), and the factor and effects definitions that bind data to math.
 - **Build plans** — a detailed, self-contained Phase 0 specification and a high-level phased roadmap for the whole arc.
+- **Project management** — charter, governance, contribution standards, decision log.
 - **The engine** — the code, arriving phase by phase.
 
 ## Status & roadmap
@@ -62,7 +67,7 @@ Each phase is independently valuable. You can stop at any boundary and still hol
 
 ## Getting involved
 
-This project sits at the intersection of astrophysics, data visualization, and hard-science-fiction worldbuilding — and it welcomes people from all three. Whether you want to argue about a coefficient, contribute a factor, sharpen a piece of the science, or help build the engine, there's a place for you. Start a conversation in **Discussions**, or open an issue.
+This project sits at the intersection of astrophysics, data visualization, and hard-science-fiction worldbuilding — and it welcomes people from all three. Whether you want to argue about a coefficient, contribute a factor, sharpen a piece of the science, or help build the engine, there's a place for you. Start a conversation in **Discussions**, read `CONTRIBUTING.md`, or open an issue.
 
 ## Why it exists
 
@@ -70,4 +75,4 @@ Beneath the astrophysics, this is a worldbuilding instrument. It was born to giv
 
 ---
 
-*The Veil maps a galaxy that is only now, after thirteen billion years, becoming truly habitable — and whose best age for life may lie in the deep future. Come help chart it.*
+*The Drake Display maps a galaxy that is only now, after thirteen billion years, becoming truly habitable — and whose best age for life may lie in the deep future. Come help chart it.*
