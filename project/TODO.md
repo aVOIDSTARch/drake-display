@@ -15,10 +15,10 @@ Open items surfaced by the project-management documents and the model-definition
 
 ## Documents / artifacts to complete
 
-- [ ] **`factors.md` — Factor Specification.** The next framework item: for each factor, its equation(s), input entity-fields, exact `f(d)` and `g(t)`, sign, magnitude, backing weight, regime, and status. With embedded **constants/parameters table** and **observable→equation→certainty derivation map** as appendices. *(Surfaced by: prior discussion; blocks `factors.py`.)*
-- [ ] **Entity-effects matrix.** The entity-first companion to `factors.md`: for each entity kind, the effects it emits/samples/receives and its role(s). Build as a matched pair with `factors.md` so the wiring can't drift. *(Surfaced by: prior discussion.)*
-- [ ] **Parameters/constants table.** Canonical values, uncertainties, and sources for `R₀`, the metallicity gradient, disk scale lengths, kill radii, flux bounds, etc. (May live inside `factors.md` for now.) *(Surfaced by: parameters discussion, equations.md.)*
-- [ ] **Ingestion column crosswalk.** Mapping of AT-HYG / NASA Exoplanet Archive / hazard-catalog columns to `entity.md` fields — the contract `ingest.py` needs. *(Surfaced by: Phase 0 plan §6.3.)*
+- [x] **`factors.md` — Factor Specification.** ✅ Done: canonical factor registry, shared profile library, per-factor notes, plus the constants/parameters table (Appendix A) and the observable→equation→certainty derivation map (Appendix B).
+- [x] **Entity-effects matrix.** ✅ Done (`entity-effects-matrix.md`): the entity-first view with Emitter/Sampler/Receiver/Field-source roles and a two-way consistency check. Built as a matched pair with `factors.md`.
+- [x] **Ingestion column crosswalk.** ✅ Done via per-source descriptions: `source-at-hyg.md` and `source-nasa-exoplanet-archive.md` (built on `data-source-info-schema.md`) — each gives the column→`entity.md` field map, per-field confidences, unit fixes, filters, and entity-resolution notes `ingest.py` needs.
+- [ ] **Propagate graded confidence through `entity.md`.** Mechanical pass: replace the single `is_speculative` boolean with per-field `provenance_tier` + `confidence` per `schema-field-definition.md`, and add source field maps per `data-source-info-schema.md`. *(Surfaced by: ADR-011.)*
 - [ ] **Issue & PR templates** (`.github/`). Structured templates aligned to the three tracks and the honesty standards. *(Surfaced by: CONTRIBUTING, GOVERNANCE.)*
 - [ ] **Canonical `ROADMAP.md`.** Either promote `roadmap-veil-project.md` to the conventional filename or link it. *(Surfaced by: repo convention.)*
 - [ ] **`CITATION`/references consolidation.** A single bibliography behind the research library's cited claims. *(Surfaced by: CONTRIBUTING honesty standards.)*
@@ -26,14 +26,13 @@ Open items surfaced by the project-management documents and the model-definition
 ## Scientific gaps to close (from `equations.md`)
 
 These block certain factors from graduating past placeholder. Each maps to a research-library document.
-
 - [ ] **`EQ-CHEM-3`** — the metallicity → habitability optimum-band curve (*Partial*).
 - [ ] **`EQ-CHEM-4`** — metallicity as a function of radius *and* cosmic time, `[Fe/H](R,t)` (*Missing*; needed for an honest time slider on the metallicity ridge).
 - [ ] **`EQ-CHEM-5`** — radiogenic heat → tectonic/dynamo longevity → habitability (*Missing*).
 - [ ] **`EQ-HAZ-1`** — a closed-form supernova lethality(distance) beyond empirical kill radii (*Partial*).
 - [ ] **`EQ-HAZ-3`** — an adopted parametrization for the GRB rate field `R_GRB(R,t)` (*Partial*).
 - [ ] **`EQ-ENERGY-1`** — a usable photosynthetic-energy-availability equation from stellar SED (*Partial*).
-- [ ] **`EQ-CORE-4`** — a rule for confidence aggregation per location (*Missing*).
+- [x] **`EQ-CORE-4`** — ✅ Defined (ADR-011): confidence propagation (weakest-link × backing weight, magnitude-weighted) → per-location `confidence_here` → blue/purple/red hue. Now a Construct in `equations-provisional.md`, no longer Missing.
 
 ## Deferred / phase-gated (deliberately not yet decided)
 

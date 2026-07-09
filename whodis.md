@@ -1,0 +1,21 @@
+# DEVELOPER IDENTITY DOCUMENT
+
+## DEVELOPER NAME
+
+Louis Casinelli, jr
+
+## PREFERRED EMAIL FOR THIS PROJECT
+
+<drake-project@hecarrieswater.com>
+
+## CREATIONS AND PROJECTS
+
+### GITHUB REPOSITORY URL
+
+<https://github.com/aVOIDSTARch>
+
+### ASSOCIATED WEBSITES
+
+## CONTACTS
+
+### SOCIAL HANDLES
