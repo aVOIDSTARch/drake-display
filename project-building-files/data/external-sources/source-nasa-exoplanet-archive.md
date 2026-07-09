@@ -5,7 +5,7 @@
 ## Metadata
 
 | Attribute | Value |
-|---|---|
+| --- | --- |
 | `source_id` | `nasa_exoarchive` |
 | `name` | NASA Exoplanet Archive — Planetary Systems (PS) table |
 | `provider` | NASA / IPAC / Caltech |
@@ -21,7 +21,7 @@
 ## Provenance classification
 
 | Attribute | Value |
-|---|---|
+| --- | --- |
 | `default_tier` | Measured / Direct (confirmed-planet parameters); some derived fields overridden below |
 | `feeds` | **load-bearing** (confirmed data; notably a *measured* metallicity source superior to the modeled gradient) |
 
@@ -30,7 +30,7 @@
 **Host star** (creates/updates a host `star_*` and a `planetary_system` entity):
 
 | field (→ `entity.md`) | source_field | type | unit | provenance_tier | confidence | derivation | notes |
-|---|---|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- | --- | --- |
 | `name` | `hostname` | string | — | Measured | 1.00 | — | host identifier; used for entity resolution |
 | `ra_icrs_deg` | `ra` | float | deg | Measured | 0.98 | — | already in degrees |
 | `dec_icrs_deg` | `dec` | float | deg | Measured | 0.98 | — | — |
@@ -45,7 +45,7 @@
 **Planet** (creates a `planet_*` entity, linked to the host):
 
 | field (→ `entity.md`) | source_field | type | unit | provenance_tier | confidence | derivation | notes |
-|---|---|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- | --- | --- |
 | `id` | `pl_name` | string | — | Measured | 1.00 | — | unique planet name |
 | `parent_star_id` | `hostname` | string | — | Measured | 1.00 | — | foreign key to host |
 | `planet_radius_rearth` | `pl_rade` | float | R⊕ | Measured | 0.85 | — | transit radius (if available) |

@@ -26,6 +26,7 @@ Open items surfaced by the project-management documents and the model-definition
 ## Scientific gaps to close (from `equations.md`)
 
 These block certain factors from graduating past placeholder. Each maps to a research-library document.
+
 - [ ] **`EQ-CHEM-3`** — the metallicity → habitability optimum-band curve (*Partial*).
 - [ ] **`EQ-CHEM-4`** — metallicity as a function of radius *and* cosmic time, `[Fe/H](R,t)` (*Missing*; needed for an honest time slider on the metallicity ridge).
 - [ ] **`EQ-CHEM-5`** — radiogenic heat → tectonic/dynamo longevity → habitability (*Missing*).

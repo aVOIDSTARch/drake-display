@@ -15,7 +15,7 @@ Each data-source description contains the following sections.
 ### 2.1 Source metadata
 
 | Attribute | Required | Meaning |
-|---|---|---|
+| --- | --- | --- |
 | `source_id` | ✓ | Short stable identifier (e.g. `gaia_dr3`, `nasa_exoarchive`, `at_hyg`) |
 | `name` | ✓ | Full name |
 | `provider` | ✓ | Organization/mission |
@@ -31,7 +31,7 @@ Each data-source description contains the following sections.
 ### 2.2 Provenance classification (the tier gate)
 
 | Attribute | Required | Meaning |
-|---|---|---|
+| --- | --- | --- |
 | `default_tier` | ✓ | The provenance tier (per `schema-field-definition.md` §3) applied to fields from this source unless overridden per-field |
 | `feeds` | ✓ | Which certainty collection this source primarily feeds: `load-bearing` or `provisional` (mirrors the equations split; see ADR-011) |
 
@@ -40,13 +40,15 @@ Each data-source description contains the following sections.
 A table, one row per field this source supplies, each described per `schema-field-definition.md`. The **confidence** column is the per-source estimate — this is the `field: luminosity → confidence: 0.98` mechanism.
 
 | `field` (→ `entity.md`) | `source_field` | `type` | `unit` | `provenance_tier` | `confidence` | `derivation` | `notes` |
-|---|---|---|---|---|---|---|---|
-| … | … | … | … | … | 0.00–1.00 | eq ID / — | … |
+|-------------------------|----------------|--------|--------|-------------------|--------------|--------------|---------|
+| …                       | …              | …      | …      | …                 | 0.00–1.00    | eq ID / —    | …       |
 
 ### 2.4 Known limitations & systematics
+
 Free text: selection effects, biases, incompleteness, dust, saturation, distance-degradation — anything that qualifies the confidences above.
 
 ### 2.5 Ingestion mapping notes
+
 How `source_field` names map to `entity.md` fields (the crosswalk `ingest.py` needs), plus any unit conversions or filters.
 
 ---
@@ -58,7 +60,7 @@ How `source_field` names map to `entity.md` fields (the crosswalk `ingest.py` ne
 **Field map (excerpt):**
 
 | field | source_field | type | unit | tier | confidence | derivation | notes |
-|---|---|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- | --- | --- |
 | `parallax_mas` | `parallax` | float | mas | Measured | 0.98 | — | zero-point offset applied |
 | `distance_pc` | (derived) | float | pc | Measured | 0.95 | EQ-GEO-1 | degrades for small parallax |
 | `teff_k` | `teff_gspphot` | float | K | Inferred | 0.80 | — | photometric temperature |

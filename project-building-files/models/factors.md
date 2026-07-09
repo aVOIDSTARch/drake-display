@@ -13,6 +13,7 @@ Each factor contributes an additive term to the log-odds of habitability (`EQ-CO
 and all terms are summed and passed through the logistic (`EQ-CORE-1/2`) to yield the probability the veil displays. Therefore every factor must define six things: **sign** (±), **backing weight w** (0–1, its science-confidence), **magnitude M** (tunable strength), a **spatial profile f** (from the shared library, §3), a **temporal profile g** (§3), and a **regime** (how it is realized — see below). `w` is the honesty dial: contested factors get low `w`, not omission.
 
 **Regimes** (from ADR-004, the dual-regime decision):
+
 - **Galactic-smooth** — a continuous field over the disk, evaluated on the coarse grid; sourced from the structural/statistical model, not individual entities.
 - **Local-point** — a discrete source with a small effect radius; visible only in local-zoom views; usually time-evolving.
 - **Stellar-property** — applies at an individual star's own location, driven by its properties.
@@ -25,7 +26,7 @@ and all terms are summed and passed through the logistic (`EQ-CORE-1/2`) to yiel
 Sign: **+** raises, **−** lowers, **∩** optimum band. `w` and `M` are starting values to tune. Status: **Specified** (ready), **Placeholder** (runs on a Missing/Partial equation), **Contested** (real but low-confidence).
 
 | ID | Name | Sign | Regime | Equations | Entity inputs | f | g | M | w | Status |
-|---|---|---|---|---|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `FAC-METAL` | Metallicity optimum band | ∩ | Galactic-smooth | EQ-CHEM-1,2,3 | `r_gal_kpc`,`feh` | P-RADIAL | G-ENRICH | 1.0 | 0.9 | Placeholder (EQ-CHEM-3/4) |
 | `FAC-FGK` | FGK sweet-spot star | + | Stellar-property | EQ-STAR-2,3,4 | `teff_k`,`spectral_type` | P-STELLAR | G-STATIC | 0.8 | 0.7 | Specified |
 | `FAC-LONGEVITY` | Stellar-longevity bonus | + | Stellar-property | EQ-STAR-1 | `mass_msun` | P-STELLAR | G-STATIC | 0.6 | 0.7 | Specified |
@@ -51,6 +52,7 @@ Sign: **+** raises, **−** lowers, **∩** optimum band. `w` and `M` are starti
 Reusable spatial (`P-`) and temporal (`G-`) functions, defined once and referenced by the registry. This keeps profiles consistent and makes `factors.py` a set of small composable functions.
 
 **Spatial:**
+
 - **P-RADIAL** — smooth function of galactocentric radius `R`. For `FAC-METAL`: compute `feh(R)` via `EQ-CHEM-1`, then map to influence via the optimum-band curve (`EQ-CHEM-3`, placeholder: rises from ~0 at low `[Fe/H]` to ~1 near solar, gentle decline above).
 - **P-DISKDENS** — normalized double-exponential density `EQ-PROF-1`: `exp(−(R−R₀)/h_R)·exp(−|z|/h_z)`.
 - **P-INNER** — steep penalty switching on inside `R_inner` (~2–3 kpc); e.g. logistic step in `R`.
@@ -61,6 +63,7 @@ Reusable spatial (`P-`) and temporal (`G-`) functions, defined once and referenc
 - **P-GLOBAL** — spatially uniform across the disk.
 
 **Temporal:**
+
 - **G-STATIC** — constant (= 1) over the scenario window.
 - **G-RAMP-SPIKE-DECAY** — the hazard clock: ramp toward `t_collapse` (`EQ-PROF-3`), spike at collapse, exponential decay after (`EQ-PROF-4`). `t_collapse` from `EQ-STAR-1`.
 - **G-SPIKE-DECAY** — one-shot spike then decay (no ramp; for merger/kilonova events).
@@ -88,7 +91,7 @@ Reusable spatial (`P-`) and temporal (`G-`) functions, defined once and referenc
 Canonical values with uncertainty and certainty tier. Values are starting points sourced from the literature; treat uncertainties as real. *(Certainty tiers per `equations.md`.)*
 
 | Symbol | Meaning | Value | Uncertainty / range | Certainty | Used by |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | `R₀` | Sun's galactocentric radius | 8.2 kpc | ±0.1 kpc | Established | coords, P-RADIAL, P-DISKDENS |
 | `z₀` | Sun's height above plane | 0.02 kpc | ±0.005 | Established | coords |
 | `∇[Fe/H]` | Radial metallicity gradient | −0.06 dex/kpc | −0.05 to −0.07 | Established | EQ-CHEM-1 |
@@ -116,7 +119,7 @@ For each derived quantity: what observable feeds it, through which equation, and
 **Tier definitions:** **Direct** (computed from observables, solid) · **Inferred** (model-dependent estimate, real scatter) · **Statistical-only** (a distribution, never a deterministic value) · **Gap** (no bridging equation exists yet).
 
 | Derived quantity | From observable(s) | Via | Tier | Caveat |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | Luminosity | apparent mag + parallax + extinction | EQ-GEO-1, dust map | **Direct** | extinction error dominates |
 | Radius | luminosity + temperature | EQ-STAR-2 | **Direct** | — |
 | HZ boundaries | luminosity | EQ-HZ-2 | **Direct** | atmosphere-model dependent |

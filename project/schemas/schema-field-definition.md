@@ -13,7 +13,7 @@ Uncertainty in this project is **per-field, not per-record**: a star's *position
 Every field is described by these attributes:
 
 | Attribute | Required | Meaning |
-|---|---|---|
+| --- | --- | --- |
 | `field` | ✓ | Canonical field name (snake_case, matches `entity.md`) |
 | `type` | ✓ | Data type: `float`, `int`, `string`, `bool`, `enum`, `datetime`, `array`, `dict` |
 | `unit` | ✓ (if physical) | Explicit unit (`kpc`, `pc`, `M☉`, `K`, `Myr`, `AU`, `dex`, …) or `—` |
@@ -31,7 +31,7 @@ A value is only "complete" when `provenance_tier` and `confidence` are both pres
 The five tiers, with their **default confidence bands**. These mirror the derivation-map tiers in `factors.md` Appendix B and are the authoritative definition:
 
 | Tier | Meaning | Default confidence band |
-|---|---|---|
+| --- | --- | --- |
 | **Measured / Direct** | Observed, or computed from observables by exact law | **0.90 – 1.00** |
 | **Inferred** | Model-dependent estimate with real scatter (e.g. isochrone mass/age) | **0.50 – 0.85** |
 | **Statistical-only** | A distribution, never a deterministic value (e.g. collapse timing, hazard rate) | **0.30 – 0.60** |
@@ -49,7 +49,7 @@ The five tiers, with their **default confidence bands**. These mirror the deriva
 The visual language for trustworthiness, defined once:
 
 | confidence | hue | reading |
-|---|---|---|
+| --- | --- | --- |
 | → 1.0 | **blue** | trustworthy / confidently true |
 | ≈ 0.5 | **purple** | mixed or moderate evidence |
 | → 0.0 | **red** | low confidence / speculative |
@@ -58,7 +58,7 @@ Renderers map `confidence` (for fields and equations) and `confidence_here` (for
 
 ## 6. Worked example
 
-```
+``` text
 field: luminosity_lsun
 type: float
 unit: L☉
@@ -69,7 +69,8 @@ source_field: (derived)
 derivation: EQ-STAR-2
 notes: from apparent mag + parallax + extinction; extinction error dominates
 ```
-```
+
+``` text
 field: feh            # same field, different source → different confidence
 type: float
 unit: dex

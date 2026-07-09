@@ -22,7 +22,7 @@ A single entity can be all at once. A red dwarf **emits** a flare hazard, **samp
 ## 2. The matrix
 
 | Entity kind (`entity.md`) | Roles | Emits | Samples | Receives | Lifecycle / notes |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | **galactic model substrate** *(pseudo-entity)* | F | `FAC-METAL` (baseline), `FAC-DENSITY`, `FAC-AGN`, `FAC-SPIRAL`, `FAC-EPOCH-GRB` | — | — | Source of all Galactic-smooth + Global-temporal factors; not an individual object |
 | `star_main_sequence` (FGK) | E, S, R-ctx | `FAC-FGK`, `FAC-LONGEVITY` | `FAC-METAL`, `FAC-RADIOHEAT`, `FAC-BINARY` | via planets | The favorable baseline star; anchors habitability where it sits |
 | `star_main_sequence` (M dwarf) | E, S, R-ctx | `FAC-FLARE`, `FAC-LONGEVITY` (large) | `FAC-METAL` | via planets | Same kind, low mass: longevity bonus but flare penalty — the red-dwarf fork |
@@ -63,7 +63,7 @@ A single entity can be all at once. A red dwarf **emits** a flare hazard, **samp
 **Every factor has at least one source** (inverse index):
 
 | Factor | Sourced by |
-|---|---|
+| --- | --- |
 | `FAC-METAL` | substrate (baseline) + all stellar samplers |
 | `FAC-FGK` | FGK main-sequence stars |
 | `FAC-LONGEVITY` | all main-sequence stars (largest for M dwarfs) |

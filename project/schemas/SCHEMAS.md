@@ -13,7 +13,7 @@
 ## 2. Registered document/data types
 
 | Type (created repeatedly) | Governing schema | Instances / location | Notes |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | **Research document** | `research-document-reqs.md` | the research library | Seven-section template; cited; certainty stated |
 | **Field definition** | `schema-field-definition.md` | within `entity.md`, source field maps, factor inputs | The atomic unit; owns the confidence scale & provenance tiers |
 | **Data-source description** | `data-source-info-schema.md` | one per source in `data-sources-catalog.md` | Source metadata + per-field confidence map |
@@ -30,7 +30,7 @@
 To keep the project consistent, these definitions live in exactly one place and are referenced, never re-defined:
 
 | Concept | Canonical definition lives in |
-|---|---|
+| --- | --- |
 | Confidence scale [0,1] & fail-safe default | `schema-field-definition.md` §4 |
 | Provenance tiers (Measured/Inferred/Statistical/Modeled/Speculative) | `schema-field-definition.md` §3 |
 | Blue→purple→red color mapping | `schema-field-definition.md` §5 |
@@ -40,6 +40,7 @@ To keep the project consistent, these definitions live in exactly one place and 
 | Roles (Emitter/Sampler/Receiver/Field-source) | `entity-effects-matrix.md` §1 |
 
 ## 4. Adding a new repeatable type
+
 1. Write its schema as a standalone document.
 2. Register it in the table above.
 3. If it introduces shared vocabulary, add that vocabulary to §3 with a single canonical home.
