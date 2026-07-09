@@ -6,7 +6,7 @@ The Drake Display is a data-visualization and modeling project that consumes pub
 
 ## Reporting a vulnerability
 
-If you discover a security issue, please report it **privately** rather than opening a public issue. Contact the maintainer directly *(contact address to be finalized — see `TODO.md`)*.
+If you discover a security issue, please report it **privately** rather than opening a public issue. Contact the maintainer directly at <drake-project@hecarrieswater.com> .
 
 Please include: a description of the issue, steps to reproduce, the affected component or version, and any suggested remediation.
 

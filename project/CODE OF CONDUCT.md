@@ -35,7 +35,7 @@ This applies to all project spaces — the repository, Discussions, issues, pull
 
 ## Enforcement
 
-Concerns may be reported to the project maintainer *(contact to be finalized — see `TODO.md`)*. Reports will be handled discreetly and in good faith. The maintainer may warn, temporarily restrict, or remove participants whose conduct harms the community, at their reasonable discretion.
+Concerns may be reported to the project maintainer at <drake-project@hecarrieswater.com>. Reports will be handled discreetly and in good faith. The maintainer may warn, temporarily restrict, or remove participants whose conduct harms the community, at their reasonable discretion.
 
 ## Spirit
 
