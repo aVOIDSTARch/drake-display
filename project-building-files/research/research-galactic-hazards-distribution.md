@@ -9,10 +9,13 @@ A "complete observer" of galactic habitability must count not just opportunities
 ## 2. Current Established Science
 
 ### 2.1 — The reframing: hazards gate the Drake equation's back end
+
 The classical Drake equation multiplies opportunities. But the fraction of worlds where life *survives long enough* to evolve complexity and technology — implicitly buried in the fₗ, fᵢ, and especially the L (longevity) terms — is gated by the local hazard rate. A hazard-aware formulation multiplies the naive opportunity count by a **survival probability S(location, epoch)**: the chance that an otherwise-habitable world is *not* sterilized within the time needed for its biosphere to mature. S is not uniform; it varies strongly across the galaxy and across cosmic history, which is the entire content of this document. The mechanism of sterilization, crucially, is almost never direct irradiation of the surface — a planetary atmosphere absorbs the gamma and X-rays. It is **indirect**: the burst's radiation drives radiolysis of atmospheric N₂ and O₂ into nitrogen oxides that catalytically **destroy the ozone layer**, after which the planet's *own star* delivers the killing blow via unfiltered ultraviolet, collapsing the photosynthetic base of the food chain. Get this mechanism right and half the common fictional errors evaporate.
 
 ### 2.2 — Gamma-ray bursts: the dominant life-limiting transient
+
 GRBs are the most consequential hazard because of their staggering luminosity and reach. Two classes, sharply different in relevance:
+
 - **Long GRBs** (duration > ~2 s): produced by the core collapse of rapidly rotating, massive, *low-metallicity* stars ("collapsars") into black holes, launching relativistic jets. <cite index="115-1">These are the dangerous ones — highest luminosity and rate.</cite>
 - **Short GRBs** (< ~2 s): neutron-star mergers. <cite index="115-1">Rarer and far less lethal — a fairly negligible source of transient hazard.</cite>
 
@@ -23,19 +26,24 @@ GRBs are the most consequential hazard because of their staggering luminosity an
 **Spatial distribution (per unit volume).** Because GRB progenitors track star formation, hazard density follows stellar density. <cite index="111-1">GRBs are far more common toward the galactic center where stellar density is high; a star within ~2 kpc of the center has a ~95% chance of a lethal GRB per Gyr, while there are practically no lethal events beyond ~30 kpc.</cite> The inner galaxy is a shooting gallery; the far outskirts are nearly safe (but metal-poor, so planet-poor — the central tension of the Galactic Habitable Zone, §2.5).
 
 ### 2.3 — The epoch dependence: why the early universe was a burned-over district
+
 This is the temporal axis your epoch-thinking points at, and it is the most underappreciated part of the hazard story. Long GRBs are **metallicity-dependent** — they form preferentially in low-metallicity gas. <cite index="115-1">Long GRBs are predominantly found in low-metallicity environments and are thus typically more frequent at high redshift.</cite> The consequences are profound: <cite index="112-1">because the long-GRB rate scales with star formation but is suppressed in metal-rich regions, the "safest place to live" migrated over the past ~12 billion years — until roughly 6 billion years ago, the metal-poor *outskirts* of the galaxy were the safest, despite hosting few planets.</cite> The early universe, metal-poor everywhere and forming stars furiously, was correspondingly GRB-saturated — a plausible reason complex life may have been broadly suppressed before ~5 Gya. Note the elegant self-correction here: the very metal enrichment that *enables* complex biochemistry (see the energy document) *also* shuts down the long-GRB progenitors that would sterilize it. Metallicity is a double key — it unlocks life's chemistry and locks away its chief cosmic threat. This directly informs the Fermi-paradox question of why we appear to be an early civilization (see `research-fermi-paradox.md`).
 
 ### 2.4 — Supernovae: the local, frequent, shorter-range hazard
+
 Less luminous than GRBs but far more common and unbeamed, core-collapse supernovae are the secondary hazard, dangerous only at close range.
+
 - **Kill radius.** The canonical figure: <cite index="122-1">Gehrels et al. (2003) computed a "kill distance" of ~8 pc (inside which ozone depletion could drive mass extinction); Fry et al. (2015) extended it to ~10 pc; and more recent work suggests it could reach ~20 pc (Thomas & Yelland 2023)</cite>, with <cite index="124-1">estimates up to ~50 pc under certain interstellar conditions (Melott et al. 2017)</cite>. A distinct and nastier subclass — <cite index="120-1">X-ray-luminous supernovae interacting with circumstellar material — can impose lethal consequences from 30–60 pc (100–200 light-years)</cite>.
 - **Rate (per volume per time).** <cite index="121-1">The time-averaged galactic rate of core-collapse supernovae within 8 pc of a given point is ~1.5 per Gyr</cite>; <cite index="123-1">on average one supernova occurs within 10 pc of Earth every ~240 Myr (estimates of the rate within 10 pc span 0.05–0.5 per Gyr)</cite>. So a *lethal-range* supernova is comparably rare to a lethal GRB at Earth's location — once per few hundred Myr.
 - **We have the receipts.** This is not hypothetical: <cite index="122-1">geological and lunar ⁶⁰Fe deposits record nearby supernovae within ~100 pc over the last ~10 Myr</cite> — specifically <cite index="119-1">events ~2.2–2.8 Mya and ~6.5–8.7 Mya at roughly 90–100 pc</cite> — close enough to leave radioactive fingerprints, far enough that life obviously survived.
 - **Bias flag — the hazard may be somewhat overstated.** A 2024 Earth-system modeling study argues that <cite index="126-1">the biosphere impacts of a nearby supernova's enhanced cosmic radiation would be limited by compensating ozone catalytic chemistry and increased cloud/aerosol cover</cite> — a reminder that atmospheric feedbacks can buffer these events, and that "kill radius" figures carry real uncertainty. Don't treat any single number as gospel.
 
 ### 2.5 — Assembling the map: the Galactic Habitable Zone
+
 Putting opportunity and hazard together yields the **Galactic Habitable Zone (GHZ)** — an annular compromise. Moving inward, metallicity rises (more planets) but stellar density, supernova rate, GRB rate, and (in the innermost regions) AGN activity all climb (more sterilization); <cite index="115-1">AGN radiation, notably, is only dangerous to habitability in the innermost galaxy</cite>. Moving outward, hazards fall but so does metallicity (fewer planets, and historically *more* long GRBs in the metal-poor gas). The balance carves out a habitable annulus in the disk — Earth's ~8 kpc galactocentric radius sits comfortably within it. **Bias flag:** the GHZ is a useful organizing idea but genuinely contested in its boundaries and even its strength; some analyses find the hazard gradients too shallow to define a sharp zone. Treat it as a real *tendency*, not a crisp border.
 
 ### 2.6 — The rest of the hazard census (secondary and situational)
+
 - **Stellar superflares:** for planets around active stars (especially M dwarfs), the host star's own flares are a chronic hazard — connecting to the red-dwarf habitability debate in the energy document.
 - **Spiral-arm passages:** a solar system crossing a spiral arm encounters elevated supernova and molecular-cloud density; combined with the Sun's vertical oscillation through the galactic plane, this produces hypothesized long-period cycles in cosmic-ray flux and possibly in extinction rates.
 - **Close stellar encounters:** a passing star can perturb a system's outer comet reservoir (Oort-cloud analog), triggering a bombardment episode.

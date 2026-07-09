@@ -21,7 +21,7 @@
 ## 1. Core field model (the veil's mathematical spine)
 
 | ID | Name | Form | Purpose / Use | Certainty |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | `EQ-CORE-1` | Log-odds combination | `logit(H) = B₀ + Σᵢ ℓᵢ` | Combine all factor contributions additively in log-odds space so they compound multiplicatively in odds and stay a valid probability | Fundamental (statistics) |
 | `EQ-CORE-2` | Logistic transform | `H = expit(logit(H)) = 1/(1+e^(−logit))` | Map combined log-odds back to a habitability probability in (0,1); the veil height | Fundamental |
 | `EQ-CORE-3` | Factor contribution | `ℓᵢ = signᵢ · wᵢ · Mᵢ · fᵢ(d) · gᵢ(t)` | Per-factor log-odds term: sign (±), backing weight w∈[0,1], magnitude M, spatial profile f, temporal profile g | **Construct** — the model's defining design choice, not physics |
@@ -32,7 +32,7 @@
 ## 2. Geometry & coordinates
 
 | ID | Name | Form | Purpose / Use | Certainty |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | `EQ-GEO-1` | Distance from parallax | `d(pc) = 1000 / ϖ(mas)` | Convert Gaia/Hipparcos parallax to distance | Fundamental |
 | `EQ-GEO-2` | ICRS → galactocentric | rotation + translation (via astropy `Galactocentric`) | Place entities in the galaxy-centered frame all radial factors require | Fundamental (standard astrometry) |
 | `EQ-GEO-3` | Cylindrical radius | `R = √(x² + y²)` | Galactocentric radius; the key input to metallicity & density fields | Fundamental |
@@ -42,7 +42,7 @@
 ## 3. Stellar physics
 
 | ID | Name | Form | Purpose / Use | Certainty |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | `EQ-STAR-1` | Main-sequence lifetime | `t_MS ≈ 10¹⁰ · (M/M☉)^(−2.5) yr` | The hazard clock: when a massive star reaches collapse (`t_collapse = t_birth + t_MS`) | Approximate (exponent 2.5–4 across mass regimes) |
 | `EQ-STAR-2` | Stefan–Boltzmann luminosity | `L = 4π R² σ T_eff⁴` | Relate radius, temperature, luminosity; underpins HZ and energy factors | Fundamental |
 | `EQ-STAR-3` | Wien's displacement | `λ_peak = b / T,  b = 2.898×10⁻³ m·K` | Spectral peak from surface temperature; drives the energy-availability factor | Fundamental |
@@ -53,19 +53,19 @@
 ## 4. Chemical evolution (metallicity → habitability)
 
 | ID | Name | Form | Purpose / Use | Certainty |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | `EQ-CHEM-1` | Radial metallicity gradient | `[Fe/H](R) ≈ [Fe/H]₀ − 0.06·(R − R₀)` dex, `R₀≈8.2 kpc` | Model metallicity where measured data is absent | Established (gradient −0.05…−0.07, real scatter, non-linear at extremes) |
 | `EQ-CHEM-2` | Giant-planet occurrence vs. metallicity | `P(giant) ≈ 10^(2·[Fe/H])` (Fischer–Valenti-type) | The empirical planet–metallicity correlation | Established (for giants; weaker for terrestrials) |
-| `EQ-CHEM-3` | Metallicity → habitability mapping (optimum band) | `— ` (rises from low-[Fe/H] floor to ~solar, gentle high-[Fe/H] penalty) | Convert metallicity to the veil's positive factor influence | **Partial** — must be assembled from EQ-CHEM-2 plus a chosen upper-penalty; no single adopted form |
+| `EQ-CHEM-3` | Metallicity → habitability mapping (optimum band) | `—` (rises from low-[Fe/H] floor to ~solar, gentle high-[Fe/H] penalty) | Convert metallicity to the veil's positive factor influence | **Partial** — must be assembled from EQ-CHEM-2 plus a chosen upper-penalty; no single adopted form |
 | `EQ-CHEM-4` | Metallicity temporal evolution | `[Fe/H](R, t) = ?` | Make the metallicity ridge rise with cosmic time (enrichment) for the time slider | **Missing** — model-dependent (chemical-evolution models); no clean closed form adopted |
-| `EQ-CHEM-5` | Radiogenic heat → tectonic longevity | `— ` from Th/U/K abundance | Map enrichment to plate-tectonics/dynamo habitability | **Missing** — research-level; no adopted equation |
+| `EQ-CHEM-5` | Radiogenic heat → tectonic longevity | `—` from Th/U/K abundance | Map enrichment to plate-tectonics/dynamo habitability | **Missing** — research-level; no adopted equation |
 
 ---
 
 ## 5. Habitable zone & planetary quantities
 
 | ID | Name | Form | Purpose / Use | Certainty |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | `EQ-HZ-1` | Insolation (Earth-relative) | `S/S⊕ = (L/L☉) / (a/AU)²` | Stellar flux a planet receives; habitability proxy | Fundamental |
 | `EQ-HZ-2` | HZ boundaries (flux scaling) | `a_in = √[(L/L☉)/S_in]`, `a_out = √[(L/L☉)/S_out]`, `S_in≈1.1, S_out≈0.35` | Habitable-zone edges from luminosity | Established (simple form; Kopparapu polynomials more rigorous) |
 | `EQ-HZ-3` | Equilibrium temperature | `T_eq = T_star·√(R_star/2a)·(1−A)^(1/4)` | Planet climate regime (albedo A assumed ~0.3) | Fundamental (given albedo assumption) |
@@ -76,7 +76,7 @@
 ## 6. Hazard physics
 
 | ID | Name | Form | Purpose / Use | Certainty |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | `EQ-HAZ-1` | Supernova lethality vs. distance | ozone depletion ∝ 1/d²; kill radius `r_k ≈ 8–10 pc` (up to ~50 pc) | Depth/reach of a supernova dip | **Partial** — empirical kill radii exist; no single agreed closed-form lethality(d) |
 | `EQ-HAZ-2` | GRB lethal fluence | `Φ_lethal ≈ 100 J/m²` → extinction-grade at ~1–2 kpc (typical), ~5000 ly (large) | Reach of a beamed long-GRB dip | Established (threshold) / Approximate (range) |
 | `EQ-HAZ-3` | GRB rate per volume/time | `R_GRB(R,t) ∝ SFR(R,t) · f_metallicity([Fe/H])` | Statistical hazard-density field at galactic scale; epoch dependence | **Partial** — semi-empirical (Piran–Jimenez); needs a parametrization adopted |
@@ -88,7 +88,7 @@
 ## 7. Spatial & temporal profiles (modeling constructs)
 
 | ID | Name | Form | Purpose / Use | Certainty |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | `EQ-PROF-1` | Disk density profile | `n(R,z) = n₀·exp(−(R−R₀)/h_R)·exp(−\|z\|/h_z)`, `h_R≈2.5, h_z≈0.3 kpc` | Statistical stellar-density hazard field (crowding, SN/GRB rate scaling) | Established (double-exponential; thin+thick actually two components) |
 | `EQ-PROF-2` | Point-hazard falloff | `f(d) = min(1, r_k²/(d²+ε))` with hard cutoff at ~5·r_k | Local-regime spatial profile of an individual hazard | **Construct** (physical input = r_k from EQ-HAZ-1) |
 | `EQ-PROF-3` | Hazard temporal ramp | `g(t) = clip((t−t_b)/(t_c−t_b),0,1)³` for t<t_c | Dip deepening as a massive star nears collapse | **Construct** (shape chosen; timing from EQ-STAR-1) |
@@ -99,8 +99,8 @@
 ## 8. Energy-for-life (constructive factors)
 
 | ID | Name | Form | Purpose / Use | Certainty |
-|---|---|---|---|---|
-| `EQ-ENERGY-1` | Photosynthetic viability from spectrum | `— ` (photon flux above the ~1.8 eV / 700 nm limit, per stellar SED) | Positive factor: is usable photosynthetic energy available at this star? | **Partial** — exergy-based bounds exist in literature; no simple adopted equation |
+| --- | --- | --- | --- | --- |
+| `EQ-ENERGY-1` | Photosynthetic viability from spectrum | `—` (photon flux above the ~1.8 eV / 700 nm limit, per stellar SED) | Positive factor: is usable photosynthetic energy available at this star? | **Partial** — exergy-based bounds exist in literature; no simple adopted equation |
 | `EQ-ENERGY-2` | Stellar-longevity bonus | function of `t_MS` (EQ-STAR-1): longer MS → more time for life | Positive factor rewarding long-lived (cool) stars | **Construct** (uses Fundamental input) |
 
 ---

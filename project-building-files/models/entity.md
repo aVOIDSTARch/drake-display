@@ -17,7 +17,7 @@
 ## 1. Core identity & classification — *required for all entities*
 
 | Field | Type | Units | Required | Source | Notes |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | `id` | string | — | ✓ | catalog-native or synthetic UUID | Unique across the entity table; stable across updates; used for cross-reference, hover persistence, bookmarking |
 | `name` | string | — | — | catalog | User-facing display name; may be empty for faint stars |
 | `catalog_name` | string | — | — | catalog | Formal designation, e.g. `Gaia DR3 4657...`, `HIP 27989`, `SNR Cas A` |
@@ -32,7 +32,7 @@
 ## 2. Positioning & coordinates — *required for all entities*
 
 | Field | Type | Units | Required | Source | Notes |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | `ra_icrs_deg` | float | degrees | ✓ | catalog | Right ascension, ICRS (0–360) |
 | `dec_icrs_deg` | float | degrees | ✓ | catalog | Declination, ICRS (−90 to +90) |
 | `distance_pc` | float | parsecs | ✓ | catalog (parallax → 1000/parallax_mas) or photometric | Heliocentric distance; guard against non-positive parallax; NULL if unmeasurable |
@@ -48,7 +48,7 @@
 ## 3. Astrometry & motion — *optional (stars/remnants)*
 
 | Field | Type | Units | Source | Notes |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | `parallax_mas` | float | milliarcsec | Gaia/Hipparcos | Inverse gives distance |
 | `pm_ra_mas_yr` | float | mas/yr | Gaia | Proper motion in RA; enables position extrapolation in time |
 | `pm_dec_mas_yr` | float | mas/yr | Gaia | Proper motion in Dec |
@@ -60,7 +60,7 @@
 ## 4. Stellar physical properties — *conditional on stellar `kind`*
 
 | Field | Type | Units | Source | Notes |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | `mass_msun` | float | M☉ | spectroscopy or mass–luminosity relation | May be estimated; **drives the main-sequence-lifetime clock** |
 | `mass_err_msun` | float | M☉ | catalog | 1σ; flags calibration confidence |
 | `radius_rsun` | float | R☉ | measured or Stefan–Boltzmann | From luminosity + temperature |
@@ -81,7 +81,7 @@
 ## 5. Chemical composition & enrichment — *conditional on stellar `kind`*
 
 | Field | Type | Units | Source | Notes |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | `feh` | float | dex | spectroscopy (APOGEE/GALAH) or **modeled `feh(R)`** | [Fe/H] vs. solar; **primary input to the metallicity-ridge factor**; if measured absent, filled from the radial gradient (flag via `is_speculative`) |
 | `feh_err` | float | dex | catalog | 1σ; distinguishes spectroscopic from grid-interpolated |
 | `alpha_fe` | float | dex | spectroscopy | [α/Fe]; high → rapid early star formation (thick-disk marker) |
@@ -97,7 +97,7 @@
 ## 6. Temporal & evolutionary properties — *drives the time slider*
 
 | Field | Type | Units | Source | Notes |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | `main_sequence_lifetime_myr` | float | Myr | derived | ~10⁴·(M/M☉)^−2.5 Myr; the hazard clock |
 | `t_birth_myr` | float | Myr | catalog (clusters) or assigned | Formation time on the scenario timeline |
 | `t_collapse_myr` | float | Myr | derived | `t_birth + main_sequence_lifetime`; when a massive star's dip spikes |
@@ -110,7 +110,7 @@
 ## 7. Planetary-system properties — *conditional on host `kind`*
 
 | Field | Type | Units | Source | Notes |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | `num_planets` | int | — | Exoplanet Archive | Confirmed planet count |
 | `num_planets_in_hz` | int | — | derived | Count within the habitable zone |
 | `hz_inner_au` | float | AU | derived | Inner habitable-zone edge from luminosity |
@@ -121,7 +121,7 @@
 ## 8. Planet-specific properties — *conditional on planet `kind`*
 
 | Field | Type | Units | Source | Notes |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | `parent_star_id` | string | — | Exoplanet Archive | Foreign key to host entity; enables hierarchical/tree UI |
 | `planet_mass_mearth` | float | M⊕ | transit/RV | Often a lower bound |
 | `planet_radius_rearth` | float | R⊕ | transit/imaging | |
@@ -137,7 +137,7 @@
 ## 9. Hazard-specific properties — *conditional on hazard `kind`*
 
 | Field | Type | Units | Source | Notes |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | `hazard_type` | enum | — | ingestion | `core_collapse_sn`/`type_ia_sn`/`long_grb`/`short_grb`/`magnetar_flare`/`stellar_flare`/`crowding` |
 | `kill_radius_kpc` | float | kpc | factors / literature | Lethal reach (ozone-destruction distance); ~0.01 kpc for SN, ~1–2 kpc for beamed long GRB |
 | `is_beamed` | bool | — | model | GRBs are beamed → only targets in the jet are affected (probabilistic contribution) |
@@ -151,7 +151,7 @@
 ## 10. Habitability-model outputs — *computed per entity at the current scenario time*
 
 | Field | Type | Units | Source | Notes |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | `factor_contributions` | dict{string→float} | — | `field.py` at render | Per-factor influence at this location/time; lets the UI explain *why* habitability is high/low here |
 | `logit_here` | float | log-odds | `field.py` | Sum of all factor logits at this entity's position (pre-`expit`) |
 | `habitability_here` | float | probability [0,1] | `field.py` | `expit(logit_here)`; the veil's height at this entity's (x,y) |
@@ -162,7 +162,7 @@
 ## 11. Provenance & metadata — *system/UI plumbing*
 
 | Field | Type | Units | Source | Notes |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | `data_source` | string | — | ingestion | Primary catalog of origin (e.g. `Gaia DR3`, `NASA Exoplanet Archive`, `TRILEGAL synthetic`) |
 | `data_source_ids` | dict | — | enrichment | Per-catalog IDs for cross-reference |
 | `last_updated` | datetime | ISO 8601 | pipeline | For cache invalidation and freshness UX |

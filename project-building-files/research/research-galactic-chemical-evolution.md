@@ -9,7 +9,9 @@ How did the Milky Way accumulate the heavy elements that planets and life requir
 ## 2. Current Established Science
 
 ### 2.1 — Where the elements come from (the nucleosynthesis ledger)
+
 Habitability is downstream of a specific manufacturing history, and the sources are distinct and datable:
+
 - **Big Bang nucleosynthesis** produced only hydrogen, helium, and a trace of lithium. The early universe contained *none* of the carbon, oxygen, silicon, iron, magnesium, or phosphorus that planets and biochemistry require. This is the hard floor: no metals, no rocky planets, no life-as-chemistry.
 - **Stellar fusion** in ordinary stars builds elements up to iron over stellar lifetimes, dispersing them via winds and, for the lighter products, planetary nebulae.
 - **Core-collapse supernovae** (massive stars) are the dominant early source of the **α-elements** (oxygen, magnesium, silicon, neon) and contribute to the rapid-neutron-capture (**r-process**) heavy elements. They act *fast* — massive stars die within millions of years of forming.
@@ -20,25 +22,31 @@ Habitability is downstream of a specific manufacturing history, and the sources 
 The practical upshot: the elemental palette available to build a planet depends entirely on how many, and which kinds, of stellar deaths have already seeded the local gas. Habitability has a *supply chain*.
 
 ### 2.2 — Metallicity, its gradients, and its evolution
+
 Astronomers compress this into **metallicity** — the abundance of elements heavier than helium, usually quoted as [Fe/H] relative to solar (solar metallicity Z ≈ 0.014). Two structural facts govern its distribution:
+
 - **A radial gradient.** The inner Milky Way is more metal-rich than the outer disk; metallicity declines outward at roughly −0.06 dex per kiloparsec. This follows from **inside-out disk formation**: the inner disk assembled and began enriching earlier and faster.
 - **A temporal rise.** Averaged over the galaxy, metallicity climbs with cosmic time as successive stellar generations return processed material to the interstellar medium — the **age–metallicity relation**. Old stars are metal-poor; young stars are metal-rich.
 
 A subtler, powerful diagnostic is the **[α/Fe] ratio**. Because core-collapse supernovae (α-elements) act immediately while Type Ia supernovae (iron) act on a ~1 Gyr delay, a region's α-to-iron ratio records its star-formation *tempo*. Rapid early star formation leaves a high-[α/Fe] "**knee**" before Type Ia iron dilutes it — which is why the old, α-enhanced **thick disk** is chemically distinct from the younger, iron-richer **thin disk**. Gaia, combined with spectroscopic surveys (APOGEE, GALAH), has turned this into a precise archaeology of the galaxy's assembly.
 
 ### 2.3 — The metallicity threshold for planets (the enabling key)
+
 Planet formation is not metallicity-neutral. The **planet–metallicity correlation** is one of the most robust results in exoplanet science: giant planets form far more frequently around metal-rich stars, because building a massive solid core before the gas disk dissipates requires abundant solids. Terrestrial planets show a weaker but still real dependence. The consequence is a rough **lower threshold**: below some metallicity, planet formation becomes inefficient, and metal-poor environments (the far outer disk, the halo, the early universe) are correspondingly planet-poor. Life's chemistry needs metals twice over — once to *have a planet at all*, and again to build the catalytic machinery (iron and magnesium sit at the literal center of hemoglobin and chlorophyll; transition metals run most enzymes).
 
 There is also a genuinely under-appreciated third role: **radiogenic heat**. The long-lived radioisotopes uranium, thorium, and potassium-40 — all forged in stellar deaths — power a planet's internal heat engine, driving **plate tectonics** and the **geodynamo** that generates a protective magnetic field. A planet's enrichment history therefore sets its budget of radioactive heating, and thus whether it can sustain the tectonic carbon cycle and magnetic shielding that long-term habitability appears to require (this connects directly to the fₚₜ plate-tectonics term flagged in the Drake document).
 
 ### 2.4 — The double key: enrichment enables life *and* disarms its chief hazard
+
 Here is the coupling that makes this whole document worth writing, and it is not coincidence but mechanism. Recall from the hazards document that **long gamma-ray bursts arise preferentially from low-metallicity massive stars** — high metallicity suppresses the collapsar channel. Therefore rising metallicity does two things *simultaneously*:
+
 1. It **enables** planets, life-chemistry, and radiogenic geophysics (§2.3).
 2. It **suppresses** the long-GRB progenitors that would sterilize those very planets (hazards document §2.3).
 
 So the arrow of galactic chemical evolution points, over cosmic time, from a metal-poor / planet-poor / GRB-saturated early universe toward a metal-rich / planet-rich / GRB-quiet later universe. Metallicity is a single dial that turns *up* habitability's prerequisites while turning *down* its principal threat. This is one of the more elegant self-consistencies in astrobiology, and it is the physical reason the deep past was hostile on *both* counts at once. (A possible countervailing effect — that *very* high metallicity might over-produce hot Jupiters that disrupt terrestrial planets — is real in principle but weakly supported; treat it as a minor, uncertain downturn at the metal-rich extreme, not an established ceiling.)
 
 ### 2.5 — The timing of habitability: are we early, average, or late?
+
 Putting the gradient and the temporal rise together yields a spacetime map of when the galaxy became habitable — and the answer is provocative. Earth formed ~4.5 Gya, roughly 9 Gyr after the Big Bang. Several converging lines of analysis suggest **we are early**: modeling of cosmic planet formation implies the majority of Earth-like planets that will ever exist **have not yet formed**, because low-mass stars (which dominate future star formation and live for trillions of years) will keep producing habitable worlds long into the future. Combined with the red-dwarf longevity argument from the energy document, this points toward a **peak of habitability lying in the cosmic future**, not the present — a metal-rich, GRB-quiet, red-dwarf-dominated era with immense time budgets, if the bioenergetic constraints on cool-star life (energy document §2.4) can be met. That "if" is the crux: the future is chemically and hazard-wise *safer*, but its dominant stars are energetically *stingier*.
 
 ## 3. Ongoing / Interesting Research Topics

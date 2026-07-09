@@ -17,11 +17,13 @@ This is a completely coherent and buildable idea. The veil is, mathematically, a
 ## Part B — The mathematics of the veil
 
 ### B.1 Work in odds/log space, not raw probability
+
 Your instinct that "overlapping effect areas would compound" is right, but *how* they compound matters. If you simply add and subtract heights linearly, strong overlapping effects can push probability below 0 or above 1, which is meaningless. The principled fix is to work in **log-odds** (the way real statistical models combine independent evidence): each factor contributes an additive term to the log-odds, which is equivalent to *multiplying* the odds — so effects compound naturally and the result always stays a valid probability after you transform back. Concretely:
 
 **logit(H) = B₀ + Σᵢ (wᵢ · Mᵢ · fᵢ(distance) · gᵢ(t))**  then  **H = 1 / (1 + e^(−logit(H)))**
 
 where for each factor i:
+
 - **wᵢ** = science-backing weight (your confidence the factor is real; see the table's 1–5 score, normalized to 0–1)
 - **Mᵢ** = effect magnitude coefficient (how strongly it pushes habitability, signed: + raises, − lowers)
 - **fᵢ(distance)** = spatial falloff profile (how the effect fades with distance from its source)
@@ -30,6 +32,7 @@ where for each factor i:
 For a remedial first version you can drop the logistic wrapper and just clamp a linear sum to [0,1] — but adopt the log-odds form as soon as you're compounding more than a few factors, or the map will lie to you at the overlaps.
 
 ### B.2 The two profile shapes you'll reuse constantly
+
 - **Spatial falloff f(d):** for point hazards (a supernova, a nearby magnetar) use an inverse-square-like or Gaussian falloff truncated at a hard "kill/effect radius" beyond which f = 0 (e.g., ~10 pc for a supernova, ~1–2 kpc for a beamed GRB — see the hazards document for real numbers). For broad fields (metallicity, stellar density) use a smooth gradient across the disk.
 - **Temporal profile g(t):** this is what makes it 4D and is your marquee feature. Your own example — a massive star that carves a *deepening dip* as it approaches core collapse, then detonates, then fades — is exactly a g(t) that ramps up over the star's main-sequence lifetime, spikes at its death, and decays as the remnant cools. Each entity gets a state function of t derived from stellar-evolution timescales (main-sequence lifetime ≈ 10 Gyr × (M/M☉)^−2.5 is a serviceable first approximation).
 
@@ -40,7 +43,7 @@ For a remedial first version you can drop the logistic wrapper and just clamp a 
 Direction: **+** raises habitability, **−** lowers it, **∩** optimum band (bad at both extremes). Backing score: 1 (speculative) → 5 (robust). Coefficient is a *suggested relative starting weight* to tune, not a measured constant — the whole point of the backing score is to keep you honest that these are model choices.
 
 | # | Factor | Dir | Mechanism | Spatial character | Temporal character | Backing (1–5) | Suggested coeff (rel.) |
-|---|---|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | **Metallicity — planet floor** | + | Enough heavy elements to form rocky planets & life-chemistry | Higher toward center; declines ~0.06 dex/kpc outward | Rises over cosmic time (enrichment) | 5 | +1.0 |
 | 2 | **Metallicity — excess** | − | Possible hot-Jupiter overproduction disrupting terrestrials | Innermost/most-enriched regions | Emerges late in enriched zones | 2 | −0.2 |
 | → | *(1 & 2 together = an optimum band, ∩)* | ∩ | | | | | |
@@ -83,35 +86,44 @@ What this means for you: **precise 3D data exists for the solar neighborhood and
 All of the following are free and publicly accessible.
 
 **Structural substrate (the disk itself):**
+
 - **Gaia (ESA)** — the crown jewel. <cite index="50-1">DR3 (June 2022) contains information for over 1.8 billion sources and is public now; DR4 is expected 2 December 2026</cite>, and <cite index="48-1">DR4 will contain ~2.8 billion processed sources (~2 billion high-quality), including — for the first time — an exoplanet list, non-single-star/binary solutions, and per-source astrophysical parameters</cite>. Access via the Gaia ESA Archive (ADQL queries), or programmatically through `astroquery`. This is your precise local 3D backbone.
 - **Spiral-arm / bar structural models** — the BeSSeL survey (Reid et al.) maser-parallax model gives the galaxy's arm geometry as usable parameters; ideal as the "model substrate" for the regions Gaia can't resolve.
 
 **Ready-made 3D star catalogs (start here for a prototype):**
+
 - **HYG database** — a merged Hipparcos + Yale + Gliese catalog of ~120,000 stars *with pre-computed Cartesian x/y/z coordinates*, distributed as plain CSV on GitHub. It is essentially purpose-built for hobbyist 3D star-map projects and is the fastest possible on-ramp for your remedial version.
 - **Gaia Catalogue of Nearby Stars (GCNS)** — ~331,000 stars within 100 pc, clean and complete for the immediate neighborhood.
 
 **Planets:**
+
 - **NASA Exoplanet Archive** — all confirmed exoplanets (5,500+) with host-star coordinates, distances, and system parameters. Free, queryable, downloadable.
 
 **Object registries (for the "click an entity, get info" feature):**
+
 - **SIMBAD** (CDS Strasbourg) — cross-identifications and basic data for ~10+ million objects, with a public API.
 - **VizieR** (CDS) — thousands of published catalogs behind one query interface.
 
 **Hazard-source catalogs (to place your dips):**
+
 - **ATNF Pulsar Catalogue** — ~3,000+ neutron stars/pulsars with positions.
 - **Green's Catalogue of Galactic Supernova Remnants** — the standard SNR list.
 - **Wolf-Rayet and massive-star catalogs** — your collapsar/long-GRB and core-collapse progenitor candidates (factors 8, 9).
 
 **Chemistry (for the metallicity field, factors 1/2/13):**
+
 - **APOGEE** (SDSS) and **GALAH** — large stellar spectroscopic surveys giving [Fe/H] and [α/Fe] across the disk; the empirical basis for your metallicity ridge.
 
 **Dust (for realism and obscuration effects):**
+
 - **3D dust maps** — Green et al. "Bayestar" and the high-resolution Edenhofer et al. (2024) map (out to ~1.25 kpc). Optional but adds authenticity.
 
 **Filling the unobserved galaxy (procedural population):**
+
 - **Galaxia / TRILEGAL** — population-synthesis tools that generate statistically realistic synthetic stellar populations for any line of sight or volume. This is how you honestly populate the far side of the disk your telescopes can't see.
 
 **Prior-art visualizers to learn from (don't reinvent):**
+
 - **Gaia Sky** (ESA, open source) — <cite index="52-1">an outreach application built specifically to explore the galaxy in 3D using Gaia data</cite>. Study it; it is the closest existing thing to your dream and its source is available.
 - **OpenSpace** (NASA-affiliated, open source) and **Celestia** — mature 3D astronomical visualization engines with time controls.
 
