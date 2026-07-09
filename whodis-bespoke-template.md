@@ -7,8 +7,8 @@
 
 ## IDENTITY
 
-- **Name:** Louis Casinelli, Jr.
-- **Callsign / Handle:** aVOIDSTARch
+- **Name:**
+- **Callsign / Handle:**
 - **Role / Title:**
 - **Team / Org:**
 - **Pronouns:**
@@ -19,7 +19,7 @@
 
 ## CONTACT
 
-- **Preferred email (this project):** <drake-project@hecarrieswater.com>
+- **Preferred email (this project):**
 - **General email:**
 - **Chat / IM:**
 - **Preferred contact method:**
@@ -29,7 +29,7 @@
 
 ## CREATIONS AND PROJECTS
 
-- **GitHub / GitLab:** <https://github.com/aVOIDSTARch>
+- **GitHub / GitLab:**
 - **Portfolio:**
 - **Associated websites:**
 - **Notable repos:**
@@ -91,6 +91,6 @@
 
 ## CHANGELOG
 
-- **Version:** 0.1
+- **Version:**
 - **Last updated:**
-- **Updated by:** Louis Casinelli, Jr.
+- **Updated by:**
