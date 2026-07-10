@@ -60,3 +60,28 @@ class AnisotropicDistance(DistanceMetric):
         # without an explicit Python loop over the leading dims.
         quad_form = np.einsum('...i,ij,...j->...', diff, self.A, diff)
         return np.sqrt(quad_form)
+
+    # Add this method to the AnisotropicDistance class in distance.py
+    @classmethod
+    def from_ellipse(cls, a: float, b: float, angle_rad: float = 0.0) -> "AnisotropicDistance":
+        """
+        Build an AnisotropicDistance from human-friendly ellipse
+        parameters instead of a raw matrix.
+
+        a, b       : semi-axis lengths along the UNROTATED x and y axes
+        angle_rad  : counterclockwise rotation of the ellipse, in radians
+        """
+        if a <= 0 or b <= 0:
+            raise ValueError("a and b must be positive")
+
+        # Step one: diagonal matrix for the unrotated ellipse
+        A_diag = np.array([[1.0 / a**2, 0.0],
+                            [0.0, 1.0 / b**2]])
+
+        # Step two: rotate via conjugation A' = R A R^T
+        c, s = np.cos(angle_rad), np.sin(angle_rad)
+        R = np.array([[c, -s],
+                      [s,  c]])
+        A_rotated = R @ A_diag @ R.T
+
+        return cls(A_rotated)

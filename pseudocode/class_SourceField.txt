@@ -1,0 +1,20 @@
+CLASS SourceField (this one is concrete, NOT abstract — no unimplemented methods)
+
+    CONSTRUCTOR(kernel, distance_metric, center, weight):
+        store all four as attributes on self
+
+    METHOD evaluate(points):
+        # points: array of shape (..., D) — same convention as DistanceMetric
+
+        step 1: use self's distance_metric to turn (points, self.center) into r
+                # r comes out shape (...) — one scalar distance per point
+
+        step 2: feed r into self's kernel to get the falloff weight per point
+                # shape stays (...)
+
+        step 3: multiply elementwise by self.weight (a scalar)
+                # this is the final contribution of THIS source at every point
+
+        return that result
+
+    __call__ shortcut -> forwards to evaluate, same convenience pattern as before
