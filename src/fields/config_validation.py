@@ -124,12 +124,17 @@ def validate_factor(raw: dict, pos_num: int, auto_correct: bool = True) -> tuple
                 issues.append(Issue(identifier, FATAL, f"distance.{param}", MISSING, None, applied=False,
                                      message=f"'{distance_type}' distance requires '{param}', no safe default"))
 
-        if distance_type == "anisotropic" and "angle_rad" not in distance_block:
-            issues.append(Issue(identifier, CORRECTABLE, "distance.angle_rad", MISSING, 0.0,
-                                 applied=auto_correct,
-                                 message="no rotation given, defaulting to 0.0 (unrotated)"))
-            if auto_correct:
-                corrected.setdefault("distance", dict(distance_block))["angle_rad"] = 0.0
+    if distance_type == "anisotropic" and "angle_rad" not in distance_block:
+      issues.append(Issue(identifier,
+                          CORRECTABLE,
+                          "distance.angle_rad",
+                          MISSING, 0.0,
+                          applied=auto_correct,
+                          message="no rotation given, defaulting to 0.0 (unrotated)"))
+    if auto_correct:
+        new_distance = dict(distance_block)   # explicit fresh copy, always
+        new_distance["angle_rad"] = 0.0
+        corrected["distance"] = new_distance  # explicit reassignment, not setdefault
 
     return issues, corrected
 
