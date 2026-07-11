@@ -2,7 +2,7 @@ from . import distance
 from . import kernels
 import numpy as np
 
-
+_unnamed_counter = 0
 
 class SourceField():
     """
@@ -17,12 +17,22 @@ class SourceField():
                 decays with distance.
     """
 
-    def __init__(self, distance_metric: distance.DistanceMetric, kernel: kernels.Kernel, center: np.ndarray, weight: float = 1.0):
+    def __init__(self, distance_metric: distance.DistanceMetric, kernel: kernels.Kernel, center: np.ndarray, weight: float = 1.0, name = None):
 
+        if name is None:
+          name = SourceField._generate_fallback_name()
+        self.name = name
         self.distance_metric = distance_metric
         self.kernel = kernel
         self.center = np.asarray(center, dtype=float)
         self.weight = weight
+
+    @staticmethod
+    def _generate_fallback_name() -> str:
+        global _unnamed_counter
+        name = f"unnamed_factor_{_unnamed_counter}"
+        _unnamed_counter += 1
+        return name
 
     def __call__(self, points: np.ndarray) -> np.ndarray:
         """
@@ -49,6 +59,7 @@ class SourceField():
         Returns:
             A numpy array of shape (...) containing the evaluated field values.
         """
+        print(self.name)
         distances = self.distance_metric(points, self.center)
         falloff =  self.kernel(distances)
         return self.weight * falloff
