@@ -35,9 +35,9 @@ class SourceField():
         Returns:
             A numpy array of shape (...) containing the evaluated field values.
         """
-        return self.evaluate(points, self.center)
+        return self.evaluate(points)
 
-    def evaluate(self, points: np.ndarray, center: np.ndarray) -> np.ndarray:
+    def evaluate(self, points: np.ndarray) -> np.ndarray:
         """
         Evaluate the source field at given points relative to a center point.
 
@@ -49,6 +49,6 @@ class SourceField():
         Returns:
             A numpy array of shape (...) containing the evaluated field values.
         """
-        distances = self.distance_metric(points, center)
-        kerneled_points =  self.kernel(distances)
-        return self.weight * kerneled_points
+        distances = self.distance_metric(points, self.center)
+        falloff =  self.kernel(distances)
+        return self.weight * falloff
