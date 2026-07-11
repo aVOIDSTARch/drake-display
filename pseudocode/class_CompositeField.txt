@@ -1,0 +1,11 @@
+CLASS CompositeField:
+
+    CONSTRUCTOR(sources):
+        store the list of sources (each one is a SourceField, or anything with the same interface)
+
+    METHOD evaluate(points):
+        for each source in the list, evaluate it at points -> get an array back
+        sum all those arrays together, elementwise
+        return the sum
+
+    __call__ -> forwards to evaluate, same pattern as before

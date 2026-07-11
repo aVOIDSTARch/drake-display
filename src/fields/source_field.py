@@ -12,7 +12,7 @@ class SourceField():
 
     Attributes:
         distance_metric: An instance of DistanceMetric that defines
-                         how to compute distances between points.
+                how to compute distances between points.
         kernel: An instance of Kernel that defines how the influence
                 decays with distance.
     """
