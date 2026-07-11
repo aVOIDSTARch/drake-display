@@ -43,6 +43,6 @@ class CompositeField():
             A numpy array of shape (...) containing the evaluated field values.
         """
         total_field = np.zeros(points.shape[:-1])
-        for source_field in self.source_fields:
-            total_field += source_field.evaluate(points)
+        for source in self.source_fields:
+          total_field += source(points)
         return total_field
