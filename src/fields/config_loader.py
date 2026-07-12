@@ -20,15 +20,15 @@ KNOWN_KERNEL_TYPES = set(kernels.KERNEL_REGISTRY.keys())
 KNOWN_DISTANCE_TYPES = set(distance.DISTANCE_REGISTRY.keys())
 
 KERNEL_BUILDERS = {
-    "gaussian": lambda block: GaussianKernel(sigma=block["sigma"]),
-    "inverse_square": lambda block: InverseSquareKernel(scale=block["scale"]),
-    "compact_support": lambda block: CompactSupportKernel(radius=block["radius"]),
-    "constant": lambda block: ConstantKernel(radius=block.get("radius")),
+    "gaussian": lambda block: kernels.GaussianKernel(sigma=block["sigma"]),
+    "inverse_square": lambda block: kernels.InverseSquareKernel(scale=block["scale"]),
+    "compact_support": lambda block: kernels.CompactSupportKernel(radius=block["radius"]),
+    "constant": lambda block: kernels.ConstantKernel(radius=block.get("radius")),
 }
 
 DISTANCE_BUILDERS = {
-    "euclidean": lambda block: EuclideanDistance(),
-    "anisotropic": lambda block: AnisotropicDistance.from_ellipse(
+    "euclidean": lambda block: distance.EuclideanDistance(),
+    "anisotropic": lambda block: distance.AnisotropicDistance.from_ellipse(
         a=block["a"], b=block["b"], angle_rad=block.get("angle_rad", 0.0)
     ),
 }
