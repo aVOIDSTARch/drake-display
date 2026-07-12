@@ -11,11 +11,13 @@ import tomllib  # standard library in Python 3.11+, reads (not writes) TOML
 import numpy as np
 
 from .config_validation import validate_document, FATAL
-from .kernels import GaussianKernel, InverseSquareKernel, CompactSupportKernel, ConstantKernel
-from .distance import EuclideanDistance, AnisotropicDistance
+from . import kernels
+from . import distance
 from .source_field import SourceField
 from .composite_field import CompositeField
 
+KNOWN_KERNEL_TYPES = set(kernels.KERNEL_REGISTRY.keys())
+KNOWN_DISTANCE_TYPES = set(distance.DISTANCE_REGISTRY.keys())
 
 KERNEL_BUILDERS = {
     "gaussian": lambda block: GaussianKernel(sigma=block["sigma"]),

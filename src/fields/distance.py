@@ -85,3 +85,10 @@ class AnisotropicDistance(DistanceMetric):
         A_rotated = R @ A_diag @ R.T
 
         return cls(A_rotated)
+
+
+
+DISTANCE_REGISTRY = {
+    "euclidean": EuclideanDistance,
+    "anisotropic": AnisotropicDistance,
+}

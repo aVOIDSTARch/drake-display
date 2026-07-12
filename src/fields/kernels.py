@@ -100,3 +100,12 @@ class CompactSupportKernel(Kernel):
     def evaluate(self, r: np.ndarray) -> np.ndarray:
         normalized = np.clip(1.0 - (r / self.radius), a_min=0.0, a_max=None)
         return normalized ** 2
+
+# add to the bottom of kernels.py
+
+KERNEL_REGISTRY = {
+    "gaussian": GaussianKernel,
+    "inverse_square": InverseSquareKernel,
+    "compact_support": CompactSupportKernel,
+    "constant": ConstantKernel,
+}

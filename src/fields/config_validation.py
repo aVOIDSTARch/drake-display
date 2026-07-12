@@ -11,14 +11,16 @@ in one pass instead of failing on the first bad field.
 from dataclasses import dataclass, field
 from difflib import get_close_matches
 from typing import Any
+from . import kernels
+from . import distance
 import itertools
 
 FATAL = "FATAL"
 CORRECTABLE = "CORRECTABLE"
 MISSING = object()  # sentinel: distinct from None, which could be a legitimate stored value
 
-KNOWN_KERNEL_TYPES = {"gaussian", "inverse_square", "compact_support", "constant"}
-KNOWN_DISTANCE_TYPES = {"euclidean", "anisotropic"}
+KNOWN_KERNEL_TYPES = set(kernels.KERNEL_REGISTRY.keys())
+KNOWN_DISTANCE_TYPES = set(distance.DISTANCE_REGISTRY.keys())
 
 REQUIRED_PARAMS_BY_KERNEL_TYPE = {
     "gaussian": ["sigma"],
