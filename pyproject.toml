@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "fields"
+name = "drake-display"
 version = "0.1.0"
 description = "Composable scalar field library and the Phase 0 habitability-veil pipeline."
 requires-python = ">=3.11"

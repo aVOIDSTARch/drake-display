@@ -9,8 +9,8 @@ Open items surfaced by the project-management documents and the model-definition
 - [x] **License(s).** ✅ Resolved (ADR-010): **MIT** for code (`LICENSE`), **CC BY 4.0** for documentation/research (`LICENSE-CONTENT`), **All Rights Reserved** for creative fiction/manuscript, third-party data under its own terms, nothing off-repo covered. Copyright holder and attribution name filled in both license files: **Louie Casinelli**.
 - [x] **Maintainer contact address.** ✅ `drake-project@hecarrieswater.com`, in `SECURITY.md` (vulnerability reports) and `CODE OF CONDUCT.md` (enforcement contact). *(Surfaced by: SECURITY, CODE_OF_CONDUCT.)*
 - [x] **Repository hosting details.** ✅ GitHub, public: <https://github.com/aVOIDSTARch/drake-display>, with Discussions, Issues, and Wiki all enabled. The Discussions intro needed no changes. *(Surfaced by: discussions-intro, README.)*
-- [ ] **Versioning scheme & first-release definition.** Confirm semantic versioning post-engine, and that "v0.1.0" = a working Phase 0 meeting its acceptance tests. *(Surfaced by: CHANGELOG.)*
-- [ ] **Project short name / handle & repo tagline.** Confirm the one-line repo description (draft: *"A hazard-aware, four-dimensional extension of the Drake equation — mapping where and when the Milky Way could hold life."*) and any short slug. *(Surfaced by: ADR-001, README.)*
+- [x] **Versioning scheme & first-release definition.** ✅ Semantic versioning (ADR-015); `v0.1.0` = a working Phase 0 that passes its acceptance tests. That bar is now met; cutting the release is a separate step. *(Surfaced by: CHANGELOG.)*
+- [ ] **Project short name / handle & repo tagline.** Short slug ✅ `drake-display` (ADR-016). **Still open:** confirm the one-line repo description (draft: *"A hazard-aware, four-dimensional extension of the Drake equation — mapping where and when the Milky Way could hold life."*). *(Surfaced by: ADR-001, README.)*
 - [ ] **Attribution/credits policy.** How contributors (science, code, worldbuilding) are credited. *(Surfaced by: GOVERNANCE, CONTRIBUTING.)*
 
 ## Documents / artifacts to complete

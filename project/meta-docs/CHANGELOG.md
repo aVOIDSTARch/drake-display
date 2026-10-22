@@ -1,6 +1,6 @@
 # Changelog — The Drake Display
 
-All notable changes to this project are recorded here. Format loosely follows *Keep a Changelog*; the project uses date-based entries during the pre-release design phase and will adopt semantic versioning once the engine ships.
+All notable changes to this project are recorded here. Format loosely follows *Keep a Changelog*; the project follows [Semantic Versioning](https://semver.org/) (ADR-015). `v0.1.0` is the first release: a working Phase 0 that passes its acceptance tests.
 
 ## [Unreleased] — Design phase
 

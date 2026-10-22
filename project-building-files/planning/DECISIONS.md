@@ -107,3 +107,17 @@ Fit, with signs, backings and profiles unchanged and the `FAC-DENSITY : FAC-AGN`
 **Rationale:** About half of the real nearby massive stars sit more than 50 pc off the Sun's plane, so the honest slice shows only some of them dipping, which reads as missing data. Projection shows them all, but overstates the reach of off-plane stars — a 100 pc-off star would appear to sterilize the plane directly beneath it. Neither is wrong as a view; only the slice is a faithful evaluation of the model at the plane, so it is the default, and the projection is available and labelled when the goal is to see where hazards are.
 **Rules out:** Silently projecting hazards; a projected view without an on-page statement that reach is overstated.
 **Enacted by:** `src/veil/registry.py` (`supernova_factor(..., project_onto_plane)`), `src/veil/main.py` (`--project-hazards`), `src/veil/interactive.py` (`intro_html`).
+
+## ADR-015 — Semantic versioning; v0.1.0 is Phase 0
+
+**Decision:** The project follows Semantic Versioning (MAJOR.MINOR.PATCH). The first release, `v0.1.0`, is defined as a working Phase 0 that passes its acceptance tests (`plan-phase0-veil-prototype.md` §9, `tests/test_phase0_acceptance.py`). While the major version is 0, the public interfaces (config schema, entity table columns, CLI) may still change between minor versions.
+**Rationale:** Date-based entries suited the design phase, when nothing executable existed. Now that there is an engine with configs and a data schema others could depend on, version numbers should signal compatibility. Tying `v0.1.0` to the acceptance tests makes the first release an objective bar rather than a judgment call.
+**Rules out:** Date-based version labels for the engine; a first release that does not pass the Phase 0 acceptance tests.
+**Enacted by:** `project/meta-docs/CHANGELOG.md`, `pyproject.toml` (`version`).
+
+## ADR-016 — Short slug: `drake-display`
+
+**Decision:** The project's short name, for repositories, package names and other identifiers where "The Drake Display" won't fit, is `drake-display`.
+**Rationale:** It matches the existing GitHub repository name, keeps the full name recognisable, and drops the article, which slugs conventionally omit.
+**Rules out:** Other slugs for the same project (e.g. the internal library name `fields` as the distribution name).
+**Enacted by:** `pyproject.toml` (`name`), the GitHub repository `aVOIDSTARch/drake-display`.
