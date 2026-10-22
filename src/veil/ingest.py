@@ -2,7 +2,7 @@
 ingest.py
 
 Raw catalogs -> one unified entity table (plan-phase0 6.3-6.5), following
-the field maps in project-building-files/data/external-sources/:
+the field maps in docs/data-sources/:
 
     load_hyg          stars from HYG (positions measured; mass, teff,
                       luminosity estimated; feh modeled from the gradient)
@@ -67,7 +67,7 @@ def _with_position(provenance: tuple[str, float]) -> dict[str, tuple[str, float]
 
 
 # Per-source field maps: field -> (provenance_tier, confidence), verbatim from
-# project-building-files/data/external-sources/source-*.md
+# docs/data-sources/source-*.md
 HYG_FIELD_MAP = {
     "ra_icrs_deg": (MEASURED, 0.98),
     "dec_icrs_deg": (MEASURED, 0.98),

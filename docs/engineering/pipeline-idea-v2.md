@@ -1,6 +1,6 @@
 # Pipeline v2 — An End-to-End Architecture for the Veil, Grounded in the Actual Model
 
-> This is a full ingestion-to-render pipeline proposal, written directly against the project's own specification: `DECISIONS.md`, `equations-core.md`, `equations-provisional.md`, `factors.md`, `entity.md`, `data-store-schema.md`, `plan-phase0-veil-prototype.md`, and `roadmap-veil-project.md`. Where those documents already answer a question, this document points to them rather than re-deciding it — the goal here is to give the *whole pipeline*, across all five phases, one coherent narrative, since today that story is split across several phase- and component-specific documents. See `pipeline-v1-assessment.md` for why the earlier draft (`pipeline-idea-v1.md`) is not that narrative.
+> This is a full ingestion-to-render pipeline proposal, written directly against the project's own specification: `DECISIONS.md`, `equations-core.md`, `equations-provisional.md`, `factors.md`, `entity.md`, `data-store-schema.md`, `plan-phase0-veil-prototype.md`, and `ROADMAP.md`. Where those documents already answer a question, this document points to them rather than re-deciding it — the goal here is to give the *whole pipeline*, across all five phases, one coherent narrative, since today that story is split across several phase- and component-specific documents. See `pipeline-v1-assessment.md` for why the earlier draft (`pipeline-idea-v1.md`) is not that narrative.
 
 ---
 
@@ -99,7 +99,7 @@ The field model (§3.3–3.4) is the single source of truth at every phase; only
 - **Phase 3:** + astroquery, Dask/Vaex for out-of-core ingestion at Gaia scale; Zarr/NetCDF for the derived `veil_field` store once it outgrows RAM; DuckDB for ad hoc querying of `entities`/`field_provenance` at scale.
 - **Phase 4:** no new core dependencies; UI and packaging work on top of the above.
 
-Nothing here is new relative to `DECISIONS.md`/`roadmap-veil-project.md` — this table exists so the *whole* pipeline's dependency story is readable in one place instead of reconstructed by reading five documents.
+Nothing here is new relative to `DECISIONS.md`/`ROADMAP.md` — this table exists so the *whole* pipeline's dependency story is readable in one place instead of reconstructed by reading five documents.
 
 ## 5. Concrete data-flow pseudocode
 

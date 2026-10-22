@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: >-
   If you use The Drake Display's model, code, or research library, please
   cite it using the metadata below. Contributors by track are listed in
-  project/meta-docs/AUTHORS.md.
+  docs/project/AUTHORS.md.
 title: The Drake Display
 type: software
 authors:

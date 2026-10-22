@@ -27,7 +27,7 @@ All notable changes to this project are recorded here. Format loosely follows *K
 - **Research library:** documents on cosmology mysteries, physics mysteries, the Drake equation, the Fermi paradox, the Kardashev scale, DNA & bio-information limits, a stellar compendium, stellar energy & life, galactic hazard distribution, and galactic chemical evolution — each following the seven-section research template with cited sources.
 - **Model concept & spec:** the habitability "veil" as a log-odds probability field; factor model with science-backing weights; dual-regime (galactic-scale vs. local) hazard handling (`spec-galactic-habitability-veil.md`).
 - **Model-definition layer:** entity schema (`entity.md`) and equation set with certainty ratings and explicit gap list (`equations.md`).
-- **Build plans:** self-contained Phase 0 specification (`plan-phase0-veil-prototype.md`) and high-level phased roadmap (`roadmap-veil-project.md`).
+- **Build plans:** self-contained Phase 0 specification (`plan-phase0-veil-prototype.md`) and high-level phased roadmap (`ROADMAP.md`).
 - **Data infrastructure:** comprehensive public data-source catalog (`data-sources-catalog.md`).
 - **Project management:** charter, governance, contributing guide, code of conduct, decision log, this changelog, security policy, and glossary.
 - **Licensing:** dual-license scheme adopted (ADR-010) — MIT for source code (`LICENSE`), CC BY 4.0 for documentation/research content (`LICENSE-CONTENT`), with creative fiction reserved (All Rights Reserved) and explicit scope limiting coverage to committed repository content only.

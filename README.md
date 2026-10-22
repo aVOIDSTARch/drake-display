@@ -45,13 +45,16 @@ Real data, real physics, real uncertainty:
 
 ## Project structure
 
-The repository is organized as layers that build on one another:
+The repository is organized as layers that build on one another. **New here? Start with [NAVIGATION.md](NAVIGATION.md)** — a guided tour of every folder and suggested reading paths.
 
-- **Research library** — the science documents that justify the model.
-- **Model-definition layer** — the formal specification: the entity schema (`entity.md`), the equation set with certainty ratings (`equations.md`), and the factor and effects definitions that bind data to math.
-- **Build plans** — a detailed, self-contained Phase 0 specification and a high-level phased roadmap for the whole arc.
-- **Project management** — charter, governance, contribution standards, decision log.
-- **The engine** — the code, arriving phase by phase.
+| Folder | What's in it |
+| --- | --- |
+| [`docs/research/`](docs/research/) | **Research library** — the science documents that justify the model |
+| [`docs/model/`](docs/model/) | **Model definition** — the veil spec, entity schema, equations with certainty ratings, and factor definitions |
+| [`docs/data-sources/`](docs/data-sources/), [`docs/schemas/`](docs/schemas/) | **Data** — where the data comes from, and how every field and its confidence is described |
+| [`docs/engineering/`](docs/engineering/) | **Build plans** — the Phase 0 spec and the end-to-end pipeline design |
+| [`docs/project/`](docs/project/) | **Project management** — charter, roadmap, decision log, changelog, governance, to-do list |
+| [`src/`](src/), [`tests/`](tests/), [`configs/`](configs/), [`data/`](data/), [`scripts/`](scripts/) | **The engine** — code, tests, model configs, curated data, and helper scripts |
 
 ## Status & roadmap
 
@@ -81,11 +84,11 @@ The first run downloads the HYG v4.1 star catalog and the NASA Exoplanet Archive
 
 **Height is habitability H; color is confidence** (blue = established, purple = mixed, red = speculative). Every value in the entity table carries its own provenance tier and confidence (ADR-011), shown in the hover text. The galactic view shows the favorable annulus carved by the metallicity band against the inner density and core penalties — H ≈ 0.2 at the core, peaking ≈ 0.75 at the Sun's radius, ≈ 0.4 at the edge (calibration targets, ADR-013):
 
-![Galactic-scale veil](docs/phase0/galactic.png)
+![Galactic-scale veil](docs/images/phase0/galactic.png)
 
 Overlapping hazards compound: in the local demo below, two massive stars' dips overlap, and the log-odds sum deepens the trough between them without ever leaving [0, 1]. The 20 M☉ star has already exploded and is recovering, while the 15 M☉ star is still approaching collapse:
 
-![Two overlapping hazard dips](docs/phase0/compounding.png)
+![Two overlapping hazard dips](docs/images/phase0/compounding.png)
 
 What each module does:
 
@@ -105,7 +108,7 @@ What each module does:
 
 ## Getting involved
 
-This project sits at the intersection of astrophysics, data visualization, and hard-science-fiction worldbuilding — and it welcomes people from all three. Whether you want to argue about a coefficient, contribute a factor, sharpen a piece of the science, or help build the engine, there's a place for you. Start a conversation in **Discussions**, read `CONTRIBUTING.md`, or open an issue.
+This project sits at the intersection of astrophysics, data visualization, and hard-science-fiction worldbuilding — and it welcomes people from all three. Whether you want to argue about a coefficient, contribute a factor, sharpen a piece of the science, or help build the engine, there's a place for you. Start a conversation in **Discussions**, read [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md), or open an issue.
 
 ## Why it exists
 

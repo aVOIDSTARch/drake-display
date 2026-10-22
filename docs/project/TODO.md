@@ -7,7 +7,7 @@ Open items surfaced by the project-management documents and the model-definition
 ## Decisions needed (a human must choose)
 
 - [x] **License(s).** ✅ Resolved (ADR-010): **MIT** for code (`LICENSE`), **CC BY 4.0** for documentation/research (`LICENSE-CONTENT`), **All Rights Reserved** for creative fiction/manuscript, third-party data under its own terms, nothing off-repo covered. Copyright holder and attribution name filled in both license files: **Louie Casinelli**.
-- [x] **Maintainer contact address.** ✅ `drake-project@hecarrieswater.com`, in `SECURITY.md` (vulnerability reports) and `CODE OF CONDUCT.md` (enforcement contact). *(Surfaced by: SECURITY, CODE_OF_CONDUCT.)*
+- [x] **Maintainer contact address.** ✅ `drake-project@hecarrieswater.com`, in `SECURITY.md` (vulnerability reports) and `CODE_OF_CONDUCT.md` (enforcement contact). *(Surfaced by: SECURITY, CODE_OF_CONDUCT.)*
 - [x] **Repository hosting details.** ✅ GitHub, public: <https://github.com/aVOIDSTARch/drake-display>, with Discussions, Issues, and Wiki all enabled. The Discussions intro needed no changes. *(Surfaced by: discussions-intro, README.)*
 - [x] **Versioning scheme & first-release definition.** ✅ Semantic versioning (ADR-015); `v0.1.0` = a working Phase 0 that passes its acceptance tests. That bar is now met; cutting the release is a separate step. *(Surfaced by: CHANGELOG.)*
 - [ ] **Project short name / handle & repo tagline.** Short slug ✅ `drake-display` (ADR-016). **Still open:** confirm the one-line repo description (draft: *"A hazard-aware, four-dimensional extension of the Drake equation — mapping where and when the Milky Way could hold life."*). *(Surfaced by: ADR-001, README.)*
@@ -20,7 +20,7 @@ Open items surfaced by the project-management documents and the model-definition
 - [x] **Ingestion column crosswalk.** ✅ Done via per-source descriptions: `source-at-hyg.md` and `source-nasa-exoplanet-archive.md` (built on `data-source-info-schema.md`) — each gives the column→`entity.md` field map, per-field confidences, unit fixes, filters, and entity-resolution notes `ingest.py` needs.
 - [x] **Propagate graded confidence through `entity.md`.** ✅ `is_speculative` marked superseded (kept under the growth rule, no longer populated). Every physical field now carries `F__tier` / `F__conf` columns with a Speculative/0.10 fail-safe, and a source field maps section links each source description. Enacted in code by `src/veil/ingest.py`. *(Surfaced by: ADR-011.)*
 - [ ] **Issue & PR templates** (`.github/`). Structured templates aligned to the three tracks and the honesty standards. *(Surfaced by: CONTRIBUTING, GOVERNANCE.)*
-- [ ] **Canonical `ROADMAP.md`.** Either promote `roadmap-veil-project.md` to the conventional filename or link it. *(Surfaced by: repo convention.)*
+- [x] **Canonical `ROADMAP.md`.** ✅ Promoted: `ROADMAP.md` is now `docs/project/ROADMAP.md`. *(Surfaced by: repo convention.)*
 - [ ] **`CITATION`/references consolidation.** A single bibliography behind the research library's cited claims. *(Surfaced by: CONTRIBUTING honesty standards.)*
 
 ## Scientific gaps to close (from `equations.md`)

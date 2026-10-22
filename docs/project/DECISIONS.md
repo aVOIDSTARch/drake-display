@@ -113,7 +113,7 @@ Fit, with signs, backings and profiles unchanged and the `FAC-DENSITY : FAC-AGN`
 **Decision:** The project follows Semantic Versioning (MAJOR.MINOR.PATCH). The first release, `v0.1.0`, is defined as a working Phase 0 that passes its acceptance tests (`plan-phase0-veil-prototype.md` §9, `tests/test_phase0_acceptance.py`). While the major version is 0, the public interfaces (config schema, entity table columns, CLI) may still change between minor versions.
 **Rationale:** Date-based entries suited the design phase, when nothing executable existed. Now that there is an engine with configs and a data schema others could depend on, version numbers should signal compatibility. Tying `v0.1.0` to the acceptance tests makes the first release an objective bar rather than a judgment call.
 **Rules out:** Date-based version labels for the engine; a first release that does not pass the Phase 0 acceptance tests.
-**Enacted by:** `project/meta-docs/CHANGELOG.md`, `pyproject.toml` (`version`).
+**Enacted by:** `docs/project/CHANGELOG.md`, `pyproject.toml` (`version`).
 
 ## ADR-016 — Short slug: `drake-display`
 
@@ -126,7 +126,7 @@ Fit, with signs, backings and profiles unchanged and the `FAC-DENSITY : FAC-AGN`
 
 **Decision:** Contributions are credited where they belong, by kind:
 
-- **`AUTHORS.md`** (`project/meta-docs/`) lists contributors grouped by track — Science, Model, Build, Worldbuilding — each with a one-line note. Listing is opt-in, under the name or handle the contributor chooses.
+- **`AUTHORS.md`** (`docs/project/`) lists contributors grouped by track — Science, Model, Build, Worldbuilding — each with a one-line note. Listing is opt-in, under the name or handle the contributor chooses.
 - **Code** is credited by the git history, with `Co-authored-by` trailers for paired work.
 - **Scientific contributions** (coefficients, corrections, sources) are also credited inline in the document or `factors.md` entry that uses them.
 - **`CITATION.cff`** at the repository root gives the citation metadata (MIT and CC-BY-4.0), kept in step with `AUTHORS.md` by the maintainer.
@@ -135,4 +135,4 @@ Fit, with signs, backings and profiles unchanged and the `FAC-DENSITY : FAC-AGN`
 
 **Rationale:** The project's three tracks produce different kinds of work, and one list can't credit them all well: commits already record code precisely, while a science contribution is only meaningful next to the number it changed — the same reason every value carries its own confidence. Opt-in naming respects contributors who don't want a legal name in a public repository. Separating repository credit from credit in the fiction keeps the creative work's rights clear and avoids a promise the license doesn't make. Disclosing AI assistance follows from the honesty standard: provenance applies to authorship too.
 **Rules out:** Listing people without consent; a single undifferentiated contributor list; implied credit in the published fiction; undisclosed AI-drafted work.
-**Enacted by:** `project/meta-docs/AUTHORS.md`, `CITATION.cff`, `CONTRIBUTING.md` (Credit), `GOVERNANCE.md`, `LICENSE-CONTENT`.
+**Enacted by:** `docs/project/AUTHORS.md`, `CITATION.cff`, `CONTRIBUTING.md` (Credit), `GOVERNANCE.md`, `LICENSE-CONTENT`.

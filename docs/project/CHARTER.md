@@ -70,6 +70,6 @@ Extend the Drake equation from a single number into a spatially- and temporally-
 
 - Research library (cosmology, physics, DNA/bio-information, stellar compendium, stellar energy & life, galactic hazards, galactic chemical evolution).
 - Model-definition layer (`entity.md`, `equations.md`; `factors.md` and the entity-effects matrix pending).
-- Build documents (`plan-phase0-veil-prototype.md`, `roadmap-veil-project.md`).
+- Build documents (`plan-phase0-veil-prototype.md`, `ROADMAP.md`).
 - Data source catalog (`data-sources-catalog.md`).
 - Project management set (this charter, governance, contributing, code of conduct, decision log, changelog, security, glossary).

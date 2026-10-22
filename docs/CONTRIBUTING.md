@@ -52,7 +52,7 @@ Factors are the heart of the model. To propose or change one:
 
 Every contribution is credited, in the place that fits what it is (ADR-017):
 
-- **Everyone — `AUTHORS.md`.** Contributors are listed in `project/meta-docs/AUTHORS.md`, grouped by track (Science, Model, Build, Worldbuilding), with a one-line note of what they did. Listing is **opt-in**, under the name or handle you choose — add yourself in your pull request, or ask the maintainer to.
+- **Everyone — `AUTHORS.md`.** Contributors are listed in `docs/project/AUTHORS.md`, grouped by track (Science, Model, Build, Worldbuilding), with a one-line note of what they did. Listing is **opt-in**, under the name or handle you choose — add yourself in your pull request, or ask the maintainer to.
 - **Code — the git history.** Commits are the detailed record. When you pair on a change, add a `Co-authored-by: Name <email>` trailer so both people are credited.
 - **Science — where the claim is used.** A coefficient, correction, or source you contribute is credited inline in the research document, `factors.md` entry, or decision that uses it, e.g. *"Gradient value suggested by A. Contributor (#42)."* That way a reader can see who vouched for a number, just as they can see its confidence. Inline credit never replaces a citation to the literature.
 - **Citing the project — `CITATION.cff`.** The repository's citation metadata (GitHub's "Cite this repository" button). The maintainer keeps its author list in step with `AUTHORS.md`.
@@ -61,6 +61,6 @@ Every contribution is credited, in the place that fits what it is (ADR-017):
 
 ## Where to start
 
-- New to the project? Read `PROJECT_CHARTER.md`, then the `README.md`, then `roadmap-veil-project.md`.
+- New to the project? Read `CHARTER.md`, then the `README.md`, then `ROADMAP.md`.
 - Want a concrete first task? The gap lists in `equations.md` and the open items in `TODO.md` are the standing to-do list.
 - Not sure where you fit? Introduce yourself in Discussions and say which of the three tracks calls to you.

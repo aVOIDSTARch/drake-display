@@ -1,6 +1,6 @@
 # Assessment: `pipeline-idea-v1.md` vs. The Drake Display's actual architecture
 
-> Reviewed against `DECISIONS.md`, `plan-phase0-veil-prototype.md`, `roadmap-veil-project.md`, `spec-galactic-habitability-veil.md`, `equations-core.md`, `equations-provisional.md`, `factors.md`, `entity.md`, and `data-store-schema.md`. The `other-science/` and `research/` folders were excluded, per instruction, since this is a systems-architecture question, not a science-content one.
+> Reviewed against `DECISIONS.md`, `plan-phase0-veil-prototype.md`, `ROADMAP.md`, `spec-galactic-habitability-veil.md`, `equations-core.md`, `equations-provisional.md`, `factors.md`, `entity.md`, and `data-store-schema.md`. The research library (`docs/research/`, including `other-science/`) was excluded, per instruction, since this is a systems-architecture question, not a science-content one.
 
 ## Bottom line
 
@@ -73,7 +73,7 @@ Independent of whether the recommendations are right, the document itself has a 
 A few individual technologies mentioned do overlap with the project's real future direction — but all of them are already specified, better, elsewhere:
 
 - **Zarr for large chunked field snapshots** — already the designated Phase-3+ successor to in-memory NumPy for `veil_field`, per `data-store-schema.md`/ADR-012.
-- **Out-of-core dataframes (Dask/Vaex)** — already the designated Phase 3 answer for Gaia-scale ingestion, per `roadmap-veil-project.md` and `plan-phase0-veil-prototype.md` §3.4.
+- **Out-of-core dataframes (Dask/Vaex)** — already the designated Phase 3 answer for Gaia-scale ingestion, per `ROADMAP.md` and `plan-phase0-veil-prototype.md` §3.4.
 - **A WebGL-family renderer** — already the designated Phase 1 target (Three.js/WebGL or deck.gl), per ADR-005 and the roadmap.
 
 Nothing else in the document is additive; picking these three ideas out doesn't require adopting any of the C++/CUDA/MPI/HDF5/Arrow/Unity apparatus around them.
