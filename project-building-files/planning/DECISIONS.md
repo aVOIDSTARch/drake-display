@@ -100,3 +100,10 @@ Fit, with signs, backings and profiles unchanged and the `FAC-DENSITY : FAC-AGN`
 **Caveat:** The solar peak remains partly built in: the placeholder metallicity band (`EQ-CHEM-3`) peaks at solar metallicity, which falls at the solar radius by construction. Resolving `EQ-CHEM-3` will require recalibrating.
 **Rules out:** Untuned starting values in rendered output; magnitudes changed without updating the targets and tests.
 **Enacted by:** `configs/phase0-galactic.toml`, `src/veil/registry.py` (`SN_MAGNITUDE`), `scripts/calibrate_phase0.py`, `tests/test_calibration.py`.
+
+## ADR-014 — Local-view hazard geometry: true 3D slice by default, projection opt-in
+
+**Decision:** The local-zoom veil is evaluated on the Sun's plane, and point hazards reach it by **true 3D distance** by default, so a star more than about one cutoff radius (~50 pc for a supernova) above or below the plane leaves no dip there. A `--project-hazards` option instead measures hazard distance **in the plane only** (from the star's vertical axis), so every nearby star's dip is shown. The page says which geometry it is using.
+**Rationale:** About half of the real nearby massive stars sit more than 50 pc off the Sun's plane, so the honest slice shows only some of them dipping, which reads as missing data. Projection shows them all, but overstates the reach of off-plane stars — a 100 pc-off star would appear to sterilize the plane directly beneath it. Neither is wrong as a view; only the slice is a faithful evaluation of the model at the plane, so it is the default, and the projection is available and labelled when the goal is to see where hazards are.
+**Rules out:** Silently projecting hazards; a projected view without an on-page statement that reach is overstated.
+**Enacted by:** `src/veil/registry.py` (`supernova_factor(..., project_onto_plane)`), `src/veil/main.py` (`--project-hazards`), `src/veil/interactive.py` (`intro_html`).

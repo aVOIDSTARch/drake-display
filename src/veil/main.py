@@ -44,6 +44,9 @@ def parse_args(argv=None) -> argparse.Namespace:
     parser.add_argument("--t-step", type=float, default=0.5, help="slider step, Myr")
     parser.add_argument("--out", type=Path, default=REPO / "output" / "phase0")
     parser.add_argument("--no-fetch", action="store_true", help="fail instead of downloading missing data")
+    parser.add_argument("--project-hazards", action="store_true",
+                        help="measure hazard reach in the plane only, so off-plane stars also dip "
+                             "(overstates their reach; default is a true 3D slice)")
     return parser.parse_args(argv)
 
 
@@ -79,7 +82,7 @@ def main(argv=None) -> None:
     print(entities["kind"].value_counts().to_string())
 
     sun = check_sun(entities)
-    galactic, local = build_fields(entities, CONFIGS)
+    galactic, local = build_fields(entities, CONFIGS, project_hazards=args.project_hazards)
     print(f"registry: {len(galactic.factors)} galactic factors, "
           f"{len(local.factors) - len(galactic.factors)} point hazards")
 
@@ -105,12 +108,13 @@ def main(argv=None) -> None:
         static_validate(local(grid.points, t=0.0), grid, "Local zoom around the Sun, t = 0",
                         str(args.out / "local_now.png"),
                         markers=[Marker(r.x_gal_kpc, r.y_gal_kpc, r.name) for r in animated["hazard"].itertuples()])
-        figures.append(interactive.local_figure(local, grid, animated, static, times))
+        figures.append(interactive.local_figure(local, grid, animated, static, times,
+                                                projected=args.project_hazards))
         print(f"local view: {len(animated['hazard'])} hazards, {len(static['system'])} exoplanet systems, "
               f"{len(times)} time steps")
 
     html = args.out / "veil.html"
-    interactive.write_html(figures, html)
+    interactive.write_html(figures, html, projected=args.project_hazards)
     print(f"wrote {html.relative_to(REPO) if html.is_relative_to(REPO) else html} "
           f"({html.stat().st_size / 1e6:.1f} MB)")
 

@@ -243,3 +243,41 @@ def test_unstated_provenance_defaults_to_speculative():
     assert out.loc[0, "teff_k__tier"] == SPECULATIVE
     assert out.loc[0, "teff_k__conf"] == 0.10
     assert np.isnan(out.loc[0, "mass_msun__conf"])
+
+
+# ---- hazard geometry: slice vs projection (ADR-014) ----
+
+def _off_plane_star(dz_kpc):
+    return pd.Series({
+        "name": "off-plane", "x_gal_kpc": -8.2, "y_gal_kpc": 0.0, "z_gal_kpc": 0.02 + dz_kpc,
+        "t_birth_myr": -5.0, "t_collapse_myr": 0.0,
+        "x_gal_kpc__conf": 0.85, "mass_msun__conf": 0.3, "t_collapse_myr__conf": 0.1,
+    })
+
+
+def test_off_plane_star_leaves_no_dip_in_the_slice():
+    from veil.registry import supernova_factor
+    on_plane_point = np.array([[-8.2, 0.0, 0.02]])
+    factor = supernova_factor(_off_plane_star(0.100))
+    assert factor.contribution(on_plane_point, t=0.0)[0] == 0.0
+
+
+def test_projection_shows_the_off_plane_dip():
+    from veil.registry import supernova_factor
+    on_plane_point = np.array([[-8.2, 0.0, 0.02]])
+    projected = supernova_factor(_off_plane_star(0.100), project_onto_plane=True)
+    in_plane = supernova_factor(_off_plane_star(0.0))
+    np.testing.assert_allclose(projected.contribution(on_plane_point, t=0.0),
+                               in_plane.contribution(on_plane_point, t=0.0))
+    assert projected.contribution(on_plane_point, t=0.0)[0] < 0
+
+
+def test_build_fields_passes_projection_through(paths):
+    from pathlib import Path
+    from fields.distance import CylindricalDistance, EuclideanDistance
+    entities = load_entities(paths)
+    configs = Path(__file__).parent.parent / "configs"
+    _, sliced = build_fields(entities, configs)
+    _, projected = build_fields(entities, configs, project_hazards=True)
+    assert isinstance(sliced.factors[-1].spatial.distance_metric, EuclideanDistance)
+    assert isinstance(projected.factors[-1].spatial.distance_metric, CylindricalDistance)

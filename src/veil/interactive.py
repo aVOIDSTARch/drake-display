@@ -133,7 +133,8 @@ def galactic_figure(field: LogOddsField, grid: Grid, groups: dict[str, pd.DataFr
 
 
 def local_figure(field: LogOddsField, grid: Grid, animated: dict[str, pd.DataFrame],
-                 static: dict[str, pd.DataFrame], times: np.ndarray) -> go.Figure:
+                 static: dict[str, pd.DataFrame], times: np.ndarray,
+                 projected: bool = False) -> go.Figure:
     """animated groups are re-evaluated in every frame; static groups are
     drawn once at times[0] (their hover H is for that time), which keeps
     the page small when they are numerous."""
@@ -151,7 +152,8 @@ def local_figure(field: LogOddsField, grid: Grid, animated: dict[str, pd.DataFra
     step_args = lambda name: [[name], dict(mode="immediate", frame=dict(duration=0, redraw=True),
                                             transition=dict(duration=0))]
     fig.update_layout(
-        title="Local zoom around the Sun — drag the slider to advance time",
+        title="Local zoom around the Sun — drag the slider to advance time"
+              + (" (hazards projected onto the plane)" if projected else ""),
         scene=_scene(grid), height=800, legend=dict(itemsizing="constant"),
         sliders=[dict(
             active=0, currentvalue=dict(prefix="t = ", suffix=" Myr from now"),
@@ -167,24 +169,31 @@ def local_figure(field: LogOddsField, grid: Grid, animated: dict[str, pd.DataFra
     return fig
 
 
-INTRO = """
+SLICE_NOTE = ("The local view is a slice through the Sun's plane, so hazard stars more than "
+              "~50 pc above or below it show no dip there.")
+PROJECTED_NOTE = ("In the local view, hazards are projected onto the Sun's plane: every star's dip "
+                  "is shown, but the reach of stars far above or below the plane is overstated.")
+
+
+def intro_html(projected: bool = False) -> str:
+    return f"""
 <h1>The Drake Display — Phase 0 veil</h1>
 <p>Height is habitability <i>H</i> (log-odds factor model); color is confidence
 (blue = well established, purple = mixed, red = speculative). Hover any marker for its data
 and provenance.</p>
 <p><b>Honesty notes.</b> The metallicity band is a placeholder (EQ-CHEM-3). Massive-star masses
-and collapse times are hand-assigned scenario values, not predictions. The local view is a slice
-through the Sun's plane, so hazard stars more than ~50 pc above or below it show no dip there.</p>
+and collapse times are hand-assigned scenario values, not predictions.
+{PROJECTED_NOTE if projected else SLICE_NOTE}</p>
 """
 
 
-def write_html(figures: list[go.Figure], out_path: Path) -> None:
+def write_html(figures: list[go.Figure], out_path: Path, projected: bool = False) -> None:
     """One self-contained page: plotly.js is inlined once, no server or network needed."""
     parts = [fig.to_html(full_html=False, include_plotlyjs=(i == 0)) for i, fig in enumerate(figures)]
     out_path.write_text(
         "<!doctype html><html><head><meta charset='utf-8'>"
         "<title>The Drake Display — Phase 0</title>"
         "<style>body{font-family:system-ui,sans-serif;margin:16px;max-width:1300px}</style>"
-        "</head><body>" + INTRO + "".join(parts) + "</body></html>",
+        "</head><body>" + intro_html(projected) + "".join(parts) + "</body></html>",
         encoding="utf-8",
     )

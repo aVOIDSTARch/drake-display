@@ -66,3 +66,10 @@ def test_check_sun_rejects_a_wrong_frame(paths):  # noqa: F811
     entities.loc[entities["id"] == "hyg:0", "r_gal_kpc"] = 8.5
     with pytest.raises(RuntimeError, match="frame"):
         check_sun(entities)
+
+
+def test_intro_states_the_hazard_geometry():
+    assert "slice through the Sun's plane" in interactive.intro_html(projected=False)
+    projected = interactive.intro_html(projected=True)
+    assert "projected onto the Sun's plane" in projected
+    assert "overstated" in projected
