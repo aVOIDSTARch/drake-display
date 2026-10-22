@@ -179,6 +179,8 @@ Each source's per-field `(provenance_tier, confidence)` values are defined once,
 | --- | --- | --- |
 | HYG / AT-HYG stars | `docs/data-sources/source-at-hyg.md` | Positions Measured; mass, Teff, luminosity Inferred; `feh` Modeled (0.40) |
 | NASA Exoplanet Archive | `docs/data-sources/source-nasa-exoplanet-archive.md` | Host `feh` Measured (0.85) where `st_met` exists, else Modeled (0.40) |
+| Galactic Wolf-Rayet stars | `docs/data-sources/source-galactic-wr-catalogue.md` | Positions Measured; distances Inferred 0.70; progenitor mass Speculative 0.20; collapse time Statistical-only 0.30 |
+| ALS III massive stars | `docs/data-sources/source-als-iii.md` | Positions Measured; distances Inferred 0.75; mass Modeled 0.30 (from spectral type); collapse time Statistical-only 0.30 |
 | Phase 0 hazard list | `data/curated/phase0_hazard_stars.csv` | Position from HYG (Measured); `mass_msun` Speculative 0.30; `t_collapse_myr`, `t_birth_myr` Speculative 0.10 (scenario values) |
 
 ## Field-group applicability by `kind` (quick reference)

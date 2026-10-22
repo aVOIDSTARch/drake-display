@@ -81,7 +81,7 @@ python src/main.py --project-hazards   # local view with every nearby hazard pro
 pytest                      # unit + Phase 0 acceptance tests
 ```
 
-The first run downloads the HYG v4.1 star catalog and the NASA Exoplanet Archive table into `data/raw/` (with retrieval dates in `data/raw/retrieved.json`). Output goes to `output/phase0/`: `veil.html`, a self-contained interactive page with a rotatable veil, hoverable entities and a time slider, plus static PNGs for quick validation.
+The first run downloads four catalogs into `data/raw/` — the HYG v4.1 star catalog, the NASA Exoplanet Archive, the Galactic Wolf-Rayet catalogue and the ALS III massive-star catalog (with retrieval dates in `data/raw/retrieved.json`). Output goes to `output/phase0/`: `veil.html`, a self-contained interactive page with a rotatable veil, hoverable entities and a time slider, plus static PNGs for quick validation.
 
 **Height is habitability H; color is confidence** (blue = established, purple = mixed, red = speculative). Every value in the entity table carries its own provenance tier and confidence (ADR-011), shown in the hover text. The galactic view shows the favorable annulus carved by the metallicity band against the inner density and core penalties — H ≈ 0.2 at the core, peaking ≈ 0.75 at the Sun's radius, ≈ 0.4 at the edge (calibration targets, ADR-013):
 

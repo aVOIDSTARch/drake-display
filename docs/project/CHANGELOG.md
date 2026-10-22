@@ -19,6 +19,9 @@ All notable changes to this project are recorded here. Format loosely follows *K
 - **Code documentation (`docs/code/`):** architecture overview, API references for `fields` and `veil` (including every entity-table column), config reference, command-line reference, testing guide, and extension recipes.
 - **Document descriptor (ADR-018):** `schema-document-descriptor.md` defines how every document is described; `docs/documents.toml` describes all of them; `tests/test_document_manifest.py` keeps the manifest in step with the repository.
 
+- **More data in the views:** the ~109k ingested HYG stars are now drawn as point clouds (one legend layer per kind).
+- **Catalog hazard stars:** 379 Wolf-Rayet stars (Rate & Crowther 2020) and ~5,300 O and early-B stars of at least 8 M☉ (ALS III) join the curated list as supernova hazards, reaching several kpc across the disk. Masses come from spectral type (Modeled); collapse times are seeded statistical draws (Statistical-only). Duplicates across catalogs are dropped by sky position. The local field includes only hazards that can reach the patch.
+
 ### Changed
 
 - **Repository layout:** documentation moved into `docs/`, grouped by purpose; the root now holds six folders. `NAVIGATION.md` explains the layout. Superseded documents, including the early pseudocode, live in `docs/archive/`.

@@ -143,3 +143,17 @@ Fit, with signs, backings and profiles unchanged and the `FAC-DENSITY : FAC-AGN`
 **Rationale:** The project already describes every *data field* by a structured, confidence-bearing descriptor (ADR-011). Documents had no equivalent: whether a document was current, proposed or replaced, and whether the code must conform to it, lived only in prose, phrased differently each time. One manifest, rather than front matter in each file, keeps the documents themselves unchanged and makes the whole set queryable in one place. Enforcing it with a test is what stops it drifting: an unenforced catalog goes stale.
 **Rules out:** Undocumented documents; status conveyed only in prose; superseded documents mixed in with current ones; a proposed document treated as binding.
 **Enacted by:** `docs/schemas/schema-document-descriptor.md`, `docs/documents.toml`, `tests/test_document_manifest.py`, `SCHEMAS.md`.
+
+## ADR-019 — Catalog hazard stars: estimated masses, statistical clocks, one copy per star
+
+**Decision:** Supernova hazards now come mainly from two catalogs: the Galactic Wolf-Rayet catalogue (Rate & Crowther 2020) and the O and early-B stars of ALS III (Pantaleoni González et al. 2021). The hand-made list stays for stars the catalogs don't cover (e.g. red supergiants).
+
+- **Mass:** for ALS III stars, estimated from spectral type with an approximate calibration (Modeled, 0.30). Only stars of at least 8 M☉ — future core-collapse supernovae — are kept. For Wolf-Rayet stars, a typical progenitor mass (Speculative, 0.20) sets only the ramp length.
+- **Collapse time:** no catalog star's age is known, so each gets a seeded random draw. For an OB star, a uniform fraction of its lifetime remains; for a Wolf-Rayet star, collapse comes uniformly within 0.5 Myr. Tier Statistical-only, 0.30. The draw is seeded per star, so it is reproducible and stable when stars are added.
+- **One copy per star:** a star listed by several sources is kept once, by sky position within 5″, preferring curated > Wolf-Rayet > ALS III > HYG.
+- **Performance:** the local field includes only the hazards that can reach the local patch.
+
+**Rationale:** Eighteen hand-placed stars could only demonstrate the time axis. Catalogs make the hazard layer real data across several kpc, with each assumption carried as provenance rather than hidden. A random draw is the honest representation of unknown timing: it is one plausible realization, labelled Statistical-only, not a prediction. A single "expected" collapse time for every star of a given mass would instead produce artificial synchronized bursts. Keeping one copy per star stops a star from dipping the veil twice.
+**Caveat:** The mass calibration is rounded from standard values from memory; verify it before relying on any individual star. Hundreds of B stars sit near the 8 M☉ threshold.
+**Rules out:** Presenting catalog collapse times as predictions; counting a star once per catalog that lists it.
+**Enacted by:** `src/veil/ingest.py` (`load_wolf_rayet`, `load_ob_stars`, `estimate_ob_mass`, `draw_clocks`, `drop_sky_duplicates`), `src/veil/registry.py` (`HAZARD_KINDS`, `hazards_reaching`), `docs/data-sources/source-galactic-wr-catalogue.md`, `docs/data-sources/source-als-iii.md`.

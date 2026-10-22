@@ -20,7 +20,7 @@ The package is named `drake-display`. It provides two importable packages, `fiel
 | --- | --- | --- |
 | *(none)* | numpy | The `fields` library alone |
 | `render` | matplotlib | `fields.render` (static PNGs) |
-| `phase0` | pandas, astropy, plotly, matplotlib | The `veil` pipeline |
+| `phase0` | pandas, astropy, scipy, plotly, matplotlib | The `veil` pipeline |
 | `dev` | pytest | Running the tests |
 
 ---
@@ -29,7 +29,7 @@ The package is named `drake-display`. It provides two importable packages, `fiel
 
 Equivalent to `python -m veil`. With no options, it does a full run:
 
-1. **Fetches** any missing catalog into `data/raw/` (first run only; about 35 MB).
+1. **Fetches** any missing catalog into `data/raw/` (first run only; about 37 MB): HYG, the NASA Exoplanet Archive, the Galactic Wolf-Rayet catalogue and ALS III.
 2. **Ingests** about 120,000 entities and writes `data/processed/entities.csv`.
 3. **Checks the frame:** stops with an error unless the Sun lands at R ≈ 8.2 kpc, z ≈ 0.
 4. **Builds** the galactic and local fields.

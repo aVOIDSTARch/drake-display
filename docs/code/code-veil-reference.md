@@ -2,7 +2,7 @@
 
 API reference for `src/veil/`, the Phase 0 pipeline that applies the `fields` library to the galaxy. For the overall flow, read [`code-architecture.md`](code-architecture.md) first. For the command line, see [`code-cli-reference.md`](code-cli-reference.md).
 
-`veil` needs the `phase0` extra (pandas, astropy, plotly, matplotlib): `pip install -e '.[phase0]'`.
+`veil` needs the `phase0` extra (pandas, astropy, scipy, plotly, matplotlib): `pip install -e '.[phase0]'`.
 
 **Contents:**
 [fetch](#fetch-veilfetch) ·
@@ -32,6 +32,9 @@ fetch_missing(raw_dir: Path) -> list[str]     # names of the files it downloaded
 | `HYG_FILE`, `HYG_URL` | `hygdata_v41.csv`, from the astronexus/HYG-Database GitHub repository |
 | `EXOPLANET_FILE`, `EXOPLANET_URL` | `exoplanets_ps.csv`, a TAP query on the NASA Exoplanet Archive `ps` table with `default_flag=1` (one row per planet) |
 | `EXOPLANET_COLUMNS` | The archive columns requested, per [`source-nasa-exoplanet-archive.md`](../data-sources/source-nasa-exoplanet-archive.md) |
+| `WR_FILE`, `WR_URL` | `wolf_rayet_rate_crowther_2020.csv`, a VizieR TAP query on `J/MNRAS/493/1512/table1` ([source](../data-sources/source-galactic-wr-catalogue.md)) |
+| `OB_FILE`, `OB_URL` | `als_iii_ob_stars.csv`, a VizieR TAP query on `J/MNRAS/504/2968/tablea1` ([source](../data-sources/source-als-iii.md)) |
+| `vizier_url(query)` | Builds a VizieR TAP synchronous CSV query URL |
 | `SOURCES` | File name → URL |
 | `RETRIEVAL_LOG` | `retrieved.json` |
 
@@ -67,8 +70,10 @@ Raw catalogs → one entity table, following the field maps in [`docs/data-sourc
 | --- | --- |
 | `load_hyg(path)` | HYG stars, with provenance |
 | `load_hazards(path, stars)` | Curated massive stars as `star_massive_progenitor` rows, positioned from their HYG rows |
+| `load_wolf_rayet(path)` | Galactic Wolf-Rayet stars as `star_wolf_rayet` rows, with a typical progenitor mass and a statistical collapse time within 0.5 Myr |
+| `load_ob_stars(path)` | ALS III O and B stars whose estimated mass is at least 8 M☉, as `star_massive_progenitor` rows, with a statistical collapse time |
 | `load_exoplanets(path)` | `planetary_system` rows (one per host) and planet rows, with provenance |
-| `load_entities(paths)` | All of the above, unified. `paths` has the keys `"hyg"`, `"exoplanets"` and `"hazards"` |
+| `load_entities(paths)` | All of the above, unified. `paths` has the keys `"hyg"`, `"exoplanets"` and `"hazards"`, and optionally `"wolf_rayet"` and `"ob_stars"`. Massive stars listed by more than one source are kept once, preferring curated > Wolf-Rayet > ALS III > HYG |
 
 **`load_hyg`**:
 - **Filtering:**
@@ -105,13 +110,24 @@ Raw catalogs → one entity table, following the field maps in [`docs/data-sourc
   | `planet_gas_giant` | larger | larger |
 - **Host [Fe/H]:** the measured `st_met` is used where present (Measured 0.85). Otherwise it's modeled from the gradient (Modeled 0.40).
 
+### Massive-star helpers
+
+| Name | Description |
+| --- | --- |
+| `estimate_ob_mass(spectral_type)` | Approximate initial mass of an O or B star from its spectral type, interpolated in log mass from three calibration tables (dwarf, giant, supergiant). NaN if the type can't be read. Modeled, good to a factor of ~1.5 |
+| `draw_clocks(ids, lifetimes=None, remaining_myr_max=None)` | Statistical collapse times for stars of unknown age: a uniform fraction of each lifetime, or a uniform time up to `remaining_myr_max`. Each draw is seeded by the star's id and `CLOCK_SEED`, so it is reproducible and doesn't change when other stars are added |
+| `drop_sky_duplicates(rows, against, radius_arcsec=5)` | The rows with no counterpart in `against` within the radius on the sky |
+| `CORE_COLLAPSE_MIN_MASS_MSUN` | 8.0 |
+| `WR_PROGENITOR_MASS_MSUN`, `WR_MAX_REMAINING_MYR` | 30.0, 0.5 |
+| `DUPLICATE_RADIUS_ARCSEC`, `CLOCK_SEED` | 5.0, 20261022 |
+
 ### Provenance helpers
 
 | Name | Description |
 | --- | --- |
 | `attach_provenance(df, field_map, rows=None)` | Writes `F__tier` and `F__conf` for each field in `field_map` wherever `F` has a value, optionally only on the boolean `rows` |
 | `enforce_provenance_default(entities)` | The ADR-011 fail-safe. Any present value with no provenance becomes Speculative / 0.10 (`fields.factor.DEFAULT_FIELD_CONFIDENCE`) |
-| `HYG_FIELD_MAP`, `HAZARD_FIELD_MAP`, `EXOPLANET_FIELD_MAP`, `MODELED_FEH` | Field → `(tier, confidence)`, copied from the source descriptions |
+| `HYG_FIELD_MAP`, `HAZARD_FIELD_MAP`, `EXOPLANET_FIELD_MAP`, `WR_FIELD_MAP`, `OB_FIELD_MAP`, `MODELED_FEH` | Field → `(tier, confidence)`, copied from the source descriptions |
 | `MEASURED`, `INFERRED`, `STATISTICAL`, `MODELED`, `SPECULATIVE` | The five tier names |
 
 ### Other helpers
@@ -137,7 +153,7 @@ Raw catalogs → one entity table, following the field maps in [`docs/data-sourc
 - Exoplanet systems: `exo-sys:<host>`.
 - Planets: `exo:<planet name>`. A planet's `parent_star_id` is its system's id.
 
-**Kinds produced in Phase 0:** `star_main_sequence`, `star_giant`, `star_supergiant`, `white_dwarf`, `star_massive_progenitor`, `planetary_system`, `planet_terrestrial`, `planet_super_earth`, `planet_mini_neptune`, `planet_gas_giant`, `exoplanet_unclassified`.
+**Kinds produced in Phase 0:** `star_main_sequence`, `star_giant`, `star_supergiant`, `white_dwarf`, `star_massive_progenitor`, `star_wolf_rayet`, `planetary_system`, `planet_terrestrial`, `planet_super_earth`, `planet_mini_neptune`, `planet_gas_giant`, `exoplanet_unclassified`.
 
 | Physical column | Unit | Filled for | Typical provenance |
 | --- | --- | --- | --- |
@@ -169,14 +185,15 @@ Turns entities and configs into fields.
 
 | Function | Description |
 | --- | --- |
-| `build_fields(entities, config_dir, project_hazards=False)` | Returns `(galactic, local)`. `galactic` is loaded from `config_dir/phase0-galactic.toml`. `local` is `LogOddsField.combine([galactic, build_hazard_field(...)])` |
-| `build_hazard_field(entities, project_onto_plane=False)` | One supernova factor per `star_massive_progenitor` row, with baseline 0 |
+| `build_fields(entities, config_dir, project_hazards=False, local_patch=None)` | Returns `(galactic, local)`. `galactic` is loaded from `config_dir/phase0-galactic.toml`. `local` is `LogOddsField.combine([galactic, build_hazard_field(...)])`. With `local_patch = (center, half_width_kpc)`, only hazards that can reach that patch are included; with thousands of catalog hazards, evaluating them all would be far too slow |
+| `build_hazard_field(entities, project_onto_plane=False)` | One supernova factor per row whose kind is in `HAZARD_KINDS`, with baseline 0 |
+| `hazards_reaching(entities, center, half_width_kpc, project_onto_plane=False)` | The hazards within `SN_REACH_KPC` of a square patch in x and y, and (unless projected) in z. Every other hazard contributes exactly zero there |
 | `supernova_factor(entity, project_onto_plane=False)` | The FAC-SN `Factor` for one entity row. See below |
 | `evaluate_at_entities(field, entities, t)` | Evaluates a field at each entity's own position. Returns a DataFrame indexed like `entities`, with `habitability_here`, `confidence_here` and `logit_here` (entity.md group 10) |
 | `near(entities, center, half_width_kpc)` | The entities whose (x, y) falls inside a square patch |
 
 **`supernova_factor`** combines:
-- **Spatial:** `TruncatedInverseSquareKernel(SN_KILL_RADIUS_KPC)` centered on the star.
+- **Spatial:** `TruncatedInverseSquareKernel(SN_KILL_RADIUS_KPC, SN_CUTOFF_FACTOR)` centered on the star.
 - **Time:** a `RampSpikeDecayProfile` built from the star's `t_birth_myr`, `t_collapse_myr` and `SN_DECAY_MYR`.
 - **Input confidences:** read from the row's `x_gal_kpc__conf`, `mass_msun__conf` and `t_collapse_myr__conf`.
 - **Distance:** true 3D (`EuclideanDistance`) by default. With `project_onto_plane=True` it's `CylindricalDistance`, which measures in the plane only. That shows every star's dip but overstates the reach of stars far off the plane (ADR-014).
@@ -188,6 +205,8 @@ Turns entities and configs into fields.
 | `SN_BACKING` | 0.9 | `factors.md` |
 | `SN_KILL_RADIUS_KPC` | 0.010 (10 pc) | `factors.md` Appendix A |
 | `SN_DECAY_MYR` | 2.0 | Phase 0 spec §6.8 |
+| `SN_CUTOFF_FACTOR`, `SN_REACH_KPC` | 5.0, 0.05 kpc | The kernel's cutoff; no effect beyond it |
+| `HAZARD_KINDS` | `star_massive_progenitor`, `star_wolf_rayet` | The kinds that get a FAC-SN factor |
 
 ---
 
