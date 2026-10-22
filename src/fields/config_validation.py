@@ -13,7 +13,7 @@ from difflib import get_close_matches
 from typing import Any
 from . import kernels
 from . import distance
-import itertools
+from ._naming import generate_unnamed_fallback
 
 FATAL = "FATAL"
 CORRECTABLE = "CORRECTABLE"
@@ -33,13 +33,6 @@ REQUIRED_PARAMS_BY_DISTANCE_TYPE = {
     "euclidean": [],
     "anisotropic": ["a", "b"],  # angle_rad handled separately -- it's CORRECTABLE, not required
 }
-
-_unnamed_counter = itertools.count()
-
-
-def generate_unnamed_fallback() -> str:
-    return f"unnamed_factor_{next(_unnamed_counter)}"
-
 
 def build_identifier(pos_num: int, name: str | None) -> str:
     return f"factor_at_pos_{pos_num}: {name if name is not None else None}"
@@ -127,16 +120,13 @@ def validate_factor(raw: dict, pos_num: int, auto_correct: bool = True) -> tuple
                                      message=f"'{distance_type}' distance requires '{param}', no safe default"))
 
     if distance_type == "anisotropic" and "angle_rad" not in distance_block:
-      issues.append(Issue(identifier,
-                          CORRECTABLE,
-                          "distance.angle_rad",
-                          MISSING, 0.0,
-                          applied=auto_correct,
-                          message="no rotation given, defaulting to 0.0 (unrotated)"))
-    if auto_correct:
-        new_distance = dict(distance_block)   # explicit fresh copy, always
-        new_distance["angle_rad"] = 0.0
-        corrected["distance"] = new_distance  # explicit reassignment, not setdefault
+        issues.append(Issue(identifier, CORRECTABLE, "distance.angle_rad", MISSING, 0.0,
+                             applied=auto_correct,
+                             message="no rotation given, defaulting to 0.0 (unrotated)"))
+        if auto_correct:
+            new_distance = dict(distance_block)   # explicit fresh copy, always
+            new_distance["angle_rad"] = 0.0
+            corrected["distance"] = new_distance  # explicit reassignment, not setdefault
 
     return issues, corrected
 

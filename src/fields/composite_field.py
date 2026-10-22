@@ -1,6 +1,3 @@
-from . import distance
-from . import kernels
-from . import source_field
 import numpy as np
 
 class CompositeField():
@@ -44,5 +41,5 @@ class CompositeField():
         """
         total_field = np.zeros(points.shape[:-1])
         for source in self.source_fields:
-          total_field += source(points)
+            total_field += source(points)
         return total_field

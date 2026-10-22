@@ -16,9 +16,6 @@ from . import distance
 from .source_field import SourceField
 from .composite_field import CompositeField
 
-KNOWN_KERNEL_TYPES = set(kernels.KERNEL_REGISTRY.keys())
-KNOWN_DISTANCE_TYPES = set(distance.DISTANCE_REGISTRY.keys())
-
 KERNEL_BUILDERS = {
     "gaussian": lambda block: kernels.GaussianKernel(sigma=block["sigma"]),
     "inverse_square": lambda block: kernels.InverseSquareKernel(scale=block["scale"]),
