@@ -189,7 +189,10 @@ and collapse times are hand-assigned scenario values, not predictions.
 
 def write_html(figures: list[go.Figure], out_path: Path, projected: bool = False) -> None:
     """One self-contained page: plotly.js is inlined once, no server or network needed."""
-    parts = [fig.to_html(full_html=False, include_plotlyjs=(i == 0)) for i, fig in enumerate(figures)]
+    # auto_play=False: plotly otherwise starts animating any figure with frames on load,
+    # so the slider would open part-way through time instead of at t = 0
+    parts = [fig.to_html(full_html=False, include_plotlyjs=(i == 0), auto_play=False)
+             for i, fig in enumerate(figures)]
     out_path.write_text(
         "<!doctype html><html><head><meta charset='utf-8'>"
         "<title>The Drake Display — Phase 0</title>"

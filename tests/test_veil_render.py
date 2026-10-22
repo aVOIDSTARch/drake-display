@@ -73,3 +73,19 @@ def test_intro_states_the_hazard_geometry():
     projected = interactive.intro_html(projected=True)
     assert "projected onto the Sun's plane" in projected
     assert "overstated" in projected
+
+
+def test_animated_page_does_not_autoplay(paths, tmp_path):  # noqa: F811
+    entities = load_entities(paths)
+    _, local = build_fields(entities, CONFIGS)
+    grid = make_grid("custom", center=(-8.2, 0.0, 0.02), spec=GridSpec(0.25, 6))
+    fig = interactive.local_figure(local, grid, {"sun": entities[entities["id"] == "hyg:0"]}, {},
+                                   np.array([0.0, 1.0]))
+    out = tmp_path / "veil.html"
+
+    interactive.write_html([fig], out)
+
+    assert fig.layout.sliders[0].active == 0
+    # plotly's default auto_play emits a Plotly.animate call that starts the
+    # slider moving on load, so the page opened part-way through time
+    assert "Plotly.animate" not in out.read_text(encoding="utf-8")
