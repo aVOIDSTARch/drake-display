@@ -21,7 +21,7 @@ from fields.render import Marker, static_validate
 
 from . import interactive
 from .coords import R0_KPC
-from .fetch import EXOPLANET_FILE, HYG_FILE, OB_FILE, WR_FILE, fetch_missing
+from .fetch import CLUSTER_FILE, EXOPLANET_FILE, HYG_FILE, OB_FILE, WR_FILE, fetch_missing
 from .ingest import load_entities
 from .registry import HAZARD_KINDS, build_fields, hazards_reaching, near
 
@@ -65,7 +65,8 @@ def main(argv=None) -> None:
     args.out.mkdir(parents=True, exist_ok=True)
 
     if args.no_fetch:
-        missing = [f for f in (HYG_FILE, EXOPLANET_FILE, WR_FILE, OB_FILE) if not (RAW / f).exists()]
+        missing = [f for f in (HYG_FILE, EXOPLANET_FILE, WR_FILE, OB_FILE, CLUSTER_FILE)
+                   if not (RAW / f).exists()]
         if missing:
             raise SystemExit(f"missing raw data {missing}; run without --no-fetch to download")
     else:
@@ -77,6 +78,7 @@ def main(argv=None) -> None:
         "hazards": REPO / "data" / "curated" / "phase0_hazard_stars.csv",
         "wolf_rayet": RAW / WR_FILE,
         "ob_stars": RAW / OB_FILE,
+        "clusters": RAW / CLUSTER_FILE,
     })
     PROCESSED.mkdir(parents=True, exist_ok=True)
     entities.to_csv(PROCESSED / "entities.csv", index=False)
@@ -93,6 +95,7 @@ def main(argv=None) -> None:
     hazards = entities[entities["kind"].isin(HAZARD_KINDS)]
     systems = entities[entities["kind"] == "planetary_system"]
     stars = entities[entities["kind"].isin(interactive.STAR_CLOUD_STYLES) & (entities["id"] != SUN_ID)]
+    clusters = entities[entities["kind"].isin(["open_cluster", "globular_cluster"])]
     figures = []
 
     if args.view in ("galactic", "both"):
@@ -102,7 +105,8 @@ def main(argv=None) -> None:
         grid = make_grid("galactic", spec=GALACTIC_HTML_SPEC)
         figures.append(interactive.galactic_figure(
             galactic, grid, {"system": systems, "hazard": hazards, "sun": sun_rows},
-            clouds=interactive.star_clouds(stars, galactic, t=0.0)))
+            clouds=[*interactive.star_clouds(stars, galactic, t=0.0),
+                    interactive.cluster_markers(clusters, galactic, t=0.0)]))
 
     if args.view in ("local", "both"):
         grid = make_grid("local", center=sun, spec=LOCAL_HTML_SPEC)
@@ -117,7 +121,9 @@ def main(argv=None) -> None:
         local_stars = near(stars, sun, hw)
         figures.append(interactive.local_figure(local, grid, animated, static, times,
                                                 projected=args.project_hazards,
-                                                clouds=interactive.star_clouds(local_stars, local, times[0])))
+                                                clouds=[*interactive.star_clouds(local_stars, local, times[0]),
+                                                        interactive.cluster_markers(near(clusters, sun, hw),
+                                                                                    local, times[0])]))
         print(f"local view: {len(animated['hazard'])} hazards, {len(static['system'])} exoplanet systems, "
               f"{len(local_stars):,} stars, {len(times)} time steps")
 

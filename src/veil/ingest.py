@@ -9,6 +9,7 @@ the field maps in docs/data-sources/:
     load_hazards      curated massive stars, joined to HYG by Hipparcos number
     load_wolf_rayet   Galactic Wolf-Rayet stars (Rate & Crowther 2020)
     load_ob_stars     O and early-B stars massive enough to explode (ALS III)
+    load_clusters     open and globular clusters with ages (Hunt & Reffert 2023)
     load_exoplanets   planetary systems + planets from the NASA Exoplanet Archive
     load_entities     all of the above, one row per entity
 
@@ -26,6 +27,7 @@ dropped by sky position, keeping curated > Wolf-Rayet > ALS III > HYG, so
 each hazard appears, and dips the veil, exactly once.
 """
 
+import io
 import re
 import zlib
 from pathlib import Path
@@ -53,6 +55,9 @@ WR_PROGENITOR_MASS_MSUN = 30.0       # typical initial mass of a Wolf-Rayet star
 WR_MAX_REMAINING_MYR = 0.5           # the Wolf-Rayet phase lasts a few hundred thousand years
 DUPLICATE_RADIUS_ARCSEC = 5.0        # same star in two catalogs, allowing for epoch differences
 CLOCK_SEED = 20261022                # fixes the statistical clock draws (see draw_clocks)
+CLUSTER_MIN_SIGNIFICANCE = 5.0       # Hunt & Reffert CST, in sigma
+CLUSTER_MIN_CMD_CLASS = 0.5          # Hunt & Reffert CMDCl50: how cluster-like the CMD looks
+CLUSTER_KINDS = {"o": "open_cluster", "g": "globular_cluster"}  # moving groups ("m") left out
 
 # Provenance tiers, schema-field-definition.md section 3
 MEASURED = "Measured"
@@ -67,8 +72,8 @@ PHYSICAL_FIELDS = [
     "ra_icrs_deg", "dec_icrs_deg", "distance_pc", *POSITION_FIELDS,
     "mag_apparent_v", "mag_absolute_v", "color_bv", "spectral_type",
     "luminosity_lsun", "teff_k", "mass_msun", "feh",
-    "main_sequence_lifetime_myr", "t_birth_myr", "t_collapse_myr",
-    "num_planets", "num_planets_in_hz",
+    "main_sequence_lifetime_myr", "t_birth_myr", "t_collapse_myr", "age_myr",
+    "num_planets", "num_planets_in_hz", "num_members",
     "planet_radius_rearth", "insolation_earth_equiv", "in_habitable_zone",
 ]
 ENTITY_COLUMNS = IDENTITY_COLUMNS + PHYSICAL_FIELDS + [
@@ -149,6 +154,16 @@ OB_FIELD_MAP = {
     "main_sequence_lifetime_myr": (MODELED, 0.30),
     "t_collapse_myr": (STATISTICAL, 0.30),
     "t_birth_myr": (STATISTICAL, 0.30),
+}
+
+# docs/data-sources/source-hunt-reffert-clusters.md
+CLUSTER_FIELD_MAP = {
+    "ra_icrs_deg": (MEASURED, 0.98),
+    "dec_icrs_deg": (MEASURED, 0.98),
+    "distance_pc": (MEASURED, 0.90),   # from the mean Gaia DR3 parallax of many members
+    **_with_position((MEASURED, 0.90)),
+    "age_myr": (INFERRED, 0.60),       # neural-network isochrone fit; soft for old or sparse clusters
+    "num_members": (INFERRED, 0.80),   # depends on the membership algorithm and magnitude limit
 }
 
 # Approximate initial masses (Msun) by spectral subtype, for three luminosity
@@ -393,6 +408,44 @@ def load_ob_stars(path: Path) -> pd.DataFrame:
     return attach_provenance(df, OB_FIELD_MAP)
 
 
+def read_vizier_tsv(path: Path) -> pd.DataFrame:
+    """Read VizieR ASU tab-separated output: '#' comment lines, then a
+    header, a units row, and a divider row before the data."""
+    lines = [line for line in path.read_text(encoding="utf-8").splitlines(keepends=True)
+             if line.strip() and not line.startswith("#")]
+    df = pd.read_csv(io.StringIO("".join([lines[0], *lines[3:]])), sep="\t")
+    df.columns = df.columns.str.strip()
+    for column in df.columns:
+        if pd.api.types.is_string_dtype(df[column]):   # object or pandas' string dtype
+            df[column] = df[column].str.strip()
+    return df
+
+
+def load_clusters(path: Path) -> pd.DataFrame:
+    """Open and globular clusters from Hunt & Reffert (2023) that pass the
+    quality cut (significance >= 5 sigma and a cluster-like CMD), with
+    Gaia-based distances and isochrone ages. Display data: no factor reads
+    them yet."""
+    raw = read_vizier_tsv(path)
+    raw = raw[raw["Type"].isin(CLUSTER_KINDS)
+              & (raw["CST"] >= CLUSTER_MIN_SIGNIFICANCE)
+              & (raw["CMDCl50"] >= CLUSTER_MIN_CMD_CLASS)
+              & (raw["dist50"] > 0)]
+    df = pd.DataFrame({
+        "id": "cluster:" + raw["Name"],
+        "name": raw["Name"].str.replace("_", " "),
+        "kind": raw["Type"].map(CLUSTER_KINDS),
+        "data_source": "Gaia DR3 star clusters (Hunt & Reffert 2023)",
+        "ra_icrs_deg": raw["RA_ICRS"],
+        "dec_icrs_deg": raw["DE_ICRS"],
+        "distance_pc": raw["dist50"],
+        "age_myr": 10 ** raw["logAge50"] / 1e6,
+        "num_members": raw["N"],
+    })
+    df = _add_positions(df)
+    return attach_provenance(df, CLUSTER_FIELD_MAP)
+
+
 def _planet_kind(radius_rearth: float, mass_mearth: float) -> str:
     """entity.md planet kind from radius (R_earth), falling back to mass (M_earth)."""
     if not np.isnan(radius_rearth):
@@ -462,7 +515,7 @@ def load_exoplanets(path: Path) -> pd.DataFrame:
 
 def load_entities(paths: dict[str, Path]) -> pd.DataFrame:
     """paths: {"hyg", "exoplanets", "hazards"} and optionally {"wolf_rayet",
-    "ob_stars"} -> unified entity table."""
+    "ob_stars", "clusters"} -> unified entity table."""
     stars = load_hyg(paths["hyg"])
     hazards = load_hazards(paths["hazards"], stars)
     stars = stars[~stars["id"].isin(hazards["id"])]
@@ -478,7 +531,8 @@ def load_entities(paths: dict[str, Path]) -> pd.DataFrame:
         stars = drop_sky_duplicates(stars, pd.concat(catalog_hazards, ignore_index=True))
 
     exoplanets = load_exoplanets(paths["exoplanets"])
-    entities = pd.concat([stars, hazards, *catalog_hazards, exoplanets], ignore_index=True)
+    clusters = [load_clusters(paths["clusters"])] if "clusters" in paths else []
+    entities = pd.concat([stars, hazards, *catalog_hazards, exoplanets, *clusters], ignore_index=True)
     for column in ENTITY_COLUMNS:
         if column not in entities:
             entities[column] = None if column.endswith("__tier") else np.nan

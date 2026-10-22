@@ -43,5 +43,6 @@ Third-party data is credited under its own terms, not listed as contributors her
 - **HYG Database v4.1** — Astronexus (David Nash), CC BY-SA 4.0. <https://github.com/astronexus/HYG-Database>
 - **Galactic Wolf-Rayet catalogue** — Rate G. & Crowther P.A. 2020, MNRAS 493, 1512, via CDS VizieR.
 - **ALS III** — Pantaleoni González M., Maíz Apellániz J., Barbá R.H. & Reed B.C. 2021, MNRAS 504, 2968, via CDS VizieR.
+- **Star clusters** — Hunt E.L. & Reffert S. 2023, A&A 673, A114, via CDS VizieR.
 - This research has made use of the VizieR catalogue access tool, CDS, Strasbourg, France.
 - **NASA Exoplanet Archive**, Planetary Systems table — NASA / IPAC / Caltech. This research has made use of the NASA Exoplanet Archive, which is operated by the California Institute of Technology, under contract with the National Aeronautics and Space Administration under the Exoplanet Exploration Program.

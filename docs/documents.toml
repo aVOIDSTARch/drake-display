@@ -280,6 +280,17 @@ governed_by = "docs/schemas/data-source-info-schema.md"
 depends_on = ["docs/model/entity.md"]
 
 [[document]]
+path = "docs/data-sources/source-hunt-reffert-clusters.md"
+title = "Data Source: Gaia DR3 Star Clusters (Hunt & Reffert 2023)"
+type = "data-source"
+status = "active"
+normative = true
+audience = ["developers", "scientists"]
+summary = "The Hunt & Reffert Gaia DR3 star-cluster census: metadata, quality cut, per-field provenance and confidence, limitations, and ingestion rules."
+governed_by = "docs/schemas/data-source-info-schema.md"
+depends_on = ["docs/model/entity.md"]
+
+[[document]]
 path = "docs/data-sources/source-als-iii.md"
 title = "Data Source: ALS III Massive Stars (Pantaleoni González et al. 2021)"
 type = "data-source"

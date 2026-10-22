@@ -21,6 +21,8 @@ All notable changes to this project are recorded here. Format loosely follows *K
 
 - **More data in the views:** the ~109k ingested HYG stars are now drawn as point clouds (one legend layer per kind).
 - **Catalog hazard stars:** 379 Wolf-Rayet stars (Rate & Crowther 2020) and ~5,300 O and early-B stars of at least 8 M☉ (ALS III) join the curated list as supernova hazards, reaching several kpc across the disk. Masses come from spectral type (Modeled); collapse times are seeded statistical draws (Statistical-only). Duplicates across catalogs are dropped by sky position. The local field includes only hazards that can reach the patch.
+- **Star clusters:** 4,025 open and globular clusters with Gaia DR3 distances and isochrone ages (Hunt & Reffert 2023), drawn colored by age; new entity field `num_members`. Display only: no factor reads them yet.
+- **More robust downloads:** dropped connections are retried and resumed; asynchronous TAP jobs for large queries, with a check that fails if a result was silently capped.
 
 ### Changed
 

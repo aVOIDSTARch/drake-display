@@ -377,3 +377,42 @@ def test_hazards_reaching_culls_to_the_patch(catalog_paths):
     far = entities[entities["id"] == "wr:WR1"]  # ~3 kpc away
     assert far["id"].iloc[0] not in set(reaching["id"])
     assert len(hazards_reaching(entities, sun, 0.25, project_onto_plane=True)) >= len(reaching)
+
+
+# ---- star clusters (Hunt & Reffert 2023) ----
+
+CLUSTER_TSV = """#
+# VizieR ASU output
+#
+Name\tType\tCST\tN\tRA_ICRS\tDE_ICRS\tdist16\tdist50\tdist84\tlogAge16\tlogAge50\tlogAge84\tCMDCl50\tr50pc
+ \t \t \t \tdeg\tdeg\tpc\tpc\tpc\t[yr]\t[yr]\t[yr]\t \tpc
+----\t-\t----\t----\t----\t----\t----\t----\t----\t----\t----\t----\t----\t----
+Young_Open          \to\t 12.0\t   150\t 83.8\t -5.4\t 380\t 400\t 420\t 6.9\t 7.0\t 7.1\t 0.99\t 2.1
+Old_Globular        \tg\t 30.0\t  5000\t 250.4\t 36.5\t 7000\t 7100\t 7200\t 10.0\t 10.1\t 10.1\t 0.95\t 3.0
+Faint_Candidate     \to\t  3.0\t    20\t 10.0\t 10.0\t 900\t 1000\t 1100\t 8.0\t 8.1\t 8.2\t 0.90\t 1.0
+Noisy_CMD           \to\t  9.0\t    40\t 20.0\t 20.0\t 900\t 1000\t 1100\t 8.0\t 8.1\t 8.2\t 0.10\t 1.0
+Moving_Group        \tm\t 10.0\t    80\t 30.0\t 30.0\t 90\t 100\t 110\t 7.5\t 7.6\t 7.7\t 0.80\t 9.0
+"""
+
+
+def test_read_vizier_tsv_skips_comments_units_and_divider(tmp_path):
+    from veil.ingest import read_vizier_tsv
+    path = tmp_path / "c.tsv"
+    path.write_text(CLUSTER_TSV)
+    df = read_vizier_tsv(path)
+    assert list(df["Name"]) == ["Young_Open", "Old_Globular", "Faint_Candidate", "Noisy_CMD", "Moving_Group"]
+    assert df["dist50"].dtype.kind in "if"  # numeric, not text
+
+
+def test_cluster_loader_applies_quality_cut_and_ages(tmp_path):
+    from veil.ingest import INFERRED, load_clusters
+    path = tmp_path / "c.tsv"
+    path.write_text(CLUSTER_TSV)
+    clusters = load_clusters(path).set_index("id")
+    assert sorted(clusters.index) == ["cluster:Old_Globular", "cluster:Young_Open"]
+    young = clusters.loc["cluster:Young_Open"]
+    assert young["kind"] == "open_cluster" and young["name"] == "Young Open"
+    assert young["age_myr"] == pytest.approx(10.0)
+    assert young["num_members"] == 150 and young["distance_pc"] == 400
+    assert young["age_myr__tier"] == INFERRED
+    assert clusters.loc["cluster:Old_Globular", "kind"] == "globular_cluster"

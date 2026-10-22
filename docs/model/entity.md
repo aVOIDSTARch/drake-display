@@ -171,6 +171,16 @@
 
 ---
 
+## 12. Cluster properties — *conditional on cluster `kind`*
+
+| Field | Type | Units | Source | Notes |
+| --- | --- | --- | --- | --- |
+| `num_members` | int | — | cluster catalog | Member stars identified by the catalog's membership algorithm; depends on its magnitude limit, so compare clusters from the same catalog only |
+
+Cluster ages use `age_myr` (§6).
+
+---
+
 ## Source field maps
 
 Each source's per-field `(provenance_tier, confidence)` values are defined once, in its source description (format: `data-source-info-schema.md`), and copied verbatim into the ingestion code (`src/veil/ingest.py`):
@@ -181,6 +191,7 @@ Each source's per-field `(provenance_tier, confidence)` values are defined once,
 | NASA Exoplanet Archive | `docs/data-sources/source-nasa-exoplanet-archive.md` | Host `feh` Measured (0.85) where `st_met` exists, else Modeled (0.40) |
 | Galactic Wolf-Rayet stars | `docs/data-sources/source-galactic-wr-catalogue.md` | Positions Measured; distances Inferred 0.70; progenitor mass Speculative 0.20; collapse time Statistical-only 0.30 |
 | ALS III massive stars | `docs/data-sources/source-als-iii.md` | Positions Measured; distances Inferred 0.75; mass Modeled 0.30 (from spectral type); collapse time Statistical-only 0.30 |
+| Hunt & Reffert star clusters | `docs/data-sources/source-hunt-reffert-clusters.md` | Distances Measured 0.90 (mean parallax of many members); ages Inferred 0.60; member counts Inferred 0.80 |
 | Phase 0 hazard list | `data/curated/phase0_hazard_stars.csv` | Position from HYG (Measured); `mass_msun` Speculative 0.30; `t_collapse_myr`, `t_birth_myr` Speculative 0.10 (scenario values) |
 
 ## Field-group applicability by `kind` (quick reference)
@@ -189,7 +200,7 @@ Each source's per-field `(provenance_tier, confidence)` values are defined once,
 - **Massive progenitor / collapsar / GRB candidate:** groups 1, 2, 4, 6, 9, 10, 11 — the time-evolving hazard drivers.
 - **Remnant (WD / NS / pulsar / magnetar / BH):** groups 1, 2, 6, 9 (for NS/magnetar flares), 10, 11.
 - **Planet:** groups 1, 2, 8, 10, 11 (+ links to parent via `parent_star_id`).
-- **Cluster / region marker:** groups 1, 2, 10, 11 (aggregate/statistical).
+- **Cluster / region marker:** groups 1, 2, 6 (`age_myr`), 10, 11, 12 (aggregate/statistical).
 
 ---
 

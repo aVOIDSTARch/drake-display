@@ -83,6 +83,10 @@ def hover_text(entity: pd.Series, here: pd.Series, t: float) -> str:
     ]
     if entity["kind"] == "planetary_system":
         lines.append(f"planets {int(entity['num_planets'])}, in HZ {int(entity['num_planets_in_hz'])}")
+    if not _is_missing(entity.get("age_myr")):
+        lines.append(f"age {_fmt(entity, 'age_myr', ',.0f', ' Myr')}")
+    if not _is_missing(entity.get("num_members")):
+        lines.append(f"members {int(entity['num_members']):,}")
     if not _is_missing(entity.get("t_collapse_myr")):
         remaining = entity["t_collapse_myr"] - t
         status = f"collapse in {remaining:.2f} Myr" if remaining > 0 else f"collapsed {-remaining:.2f} Myr ago"
@@ -136,6 +140,28 @@ def point_cloud(label: str, xyz: np.ndarray, field: LogOddsField, t: float, colo
         marker=dict(size=size, color=color),
         name=f"{label} ({len(xyz):,})",
         hovertemplate=f"{label}<br>x %{{x:.3f}} kpc, y %{{y:.3f}} kpc<br>H %{{z:.2f}}<extra></extra>",
+    )
+
+
+CLUSTER_AGE_RANGE_LOG_MYR = (0.5, 4.0)  # ~3 Myr to 10 Gyr
+
+
+def cluster_markers(entities: pd.DataFrame, field: LogOddsField, t: float) -> go.Scatter3d:
+    """Star clusters, hoverable, colored by log10 age (young = dark, old = bright).
+    Clusters under ~50 Myr still hold stars that will go supernova."""
+    here = evaluate_at_entities(field, entities, t)
+    lo, hi = CLUSTER_AGE_RANGE_LOG_MYR
+    return go.Scatter3d(
+        x=entities["x_gal_kpc"], y=entities["y_gal_kpc"],
+        z=(here["habitability_here"] + MARKER_LIFT).astype(np.float32),
+        mode="markers",
+        marker=dict(size=3.5, symbol="diamond-open", color=np.log10(entities["age_myr"]).astype(np.float32),
+                    colorscale="Plasma", cmin=lo, cmax=hi,
+                    colorbar=dict(title="cluster age<br>log₁₀ Myr", x=-0.06, len=0.4, y=0.2,
+                                  yanchor="middle")),
+        hovertext=[hover_text(e, h, t) for (_, e), (_, h) in zip(entities.iterrows(), here.iterrows())],
+        hoverinfo="text",
+        name=f"Star clusters, colored by age ({len(entities):,})",
     )
 
 

@@ -34,6 +34,7 @@ fetch_missing(raw_dir: Path) -> list[str]     # names of the files it downloaded
 | `EXOPLANET_COLUMNS` | The archive columns requested, per [`source-nasa-exoplanet-archive.md`](../data-sources/source-nasa-exoplanet-archive.md) |
 | `WR_FILE`, `WR_URL` | `wolf_rayet_rate_crowther_2020.csv`, a VizieR TAP query on `J/MNRAS/493/1512/table1` ([source](../data-sources/source-galactic-wr-catalogue.md)) |
 | `OB_FILE`, `OB_URL` | `als_iii_ob_stars.csv`, a VizieR TAP query on `J/MNRAS/504/2968/tablea1` ([source](../data-sources/source-als-iii.md)) |
+| `CLUSTER_FILE`, `CLUSTER_URL` | `hunt_reffert_2023_clusters.tsv`, a VizieR ASU (tab-separated) download of `J/A+A/673/A114/clusters` ([source](../data-sources/source-hunt-reffert-clusters.md)) |
 | `vizier_url(query)` | Builds a VizieR TAP synchronous CSV query URL |
 | `SOURCES` | File name → URL |
 | `RETRIEVAL_LOG` | `retrieved.json` |
@@ -71,9 +72,11 @@ Raw catalogs → one entity table, following the field maps in [`docs/data-sourc
 | `load_hyg(path)` | HYG stars, with provenance |
 | `load_hazards(path, stars)` | Curated massive stars as `star_massive_progenitor` rows, positioned from their HYG rows |
 | `load_wolf_rayet(path)` | Galactic Wolf-Rayet stars as `star_wolf_rayet` rows, with a typical progenitor mass and a statistical collapse time within 0.5 Myr |
+| `load_clusters(path)` | Open and globular clusters from Hunt & Reffert (2023) passing the quality cut (CST ≥ 5, CMDCl50 ≥ 0.5), with distances, ages and member counts. Display data: no factor reads them |
+| `read_vizier_tsv(path)` | Reads VizieR ASU tab-separated output, skipping comments and the units and divider rows, and stripping padding from text |
 | `load_ob_stars(path)` | ALS III O and B stars whose estimated mass is at least 8 M☉, as `star_massive_progenitor` rows, with a statistical collapse time |
 | `load_exoplanets(path)` | `planetary_system` rows (one per host) and planet rows, with provenance |
-| `load_entities(paths)` | All of the above, unified. `paths` has the keys `"hyg"`, `"exoplanets"` and `"hazards"`, and optionally `"wolf_rayet"` and `"ob_stars"`. Massive stars listed by more than one source are kept once, preferring curated > Wolf-Rayet > ALS III > HYG |
+| `load_entities(paths)` | All of the above, unified. `paths` has the keys `"hyg"`, `"exoplanets"` and `"hazards"`, and optionally `"wolf_rayet"`, `"ob_stars"` and `"clusters"`. Massive stars listed by more than one source are kept once, preferring curated > Wolf-Rayet > ALS III > HYG |
 
 **`load_hyg`**:
 - **Filtering:**
@@ -100,7 +103,7 @@ Raw catalogs → one entity table, following the field maps in [`docs/data-sourc
 - **Filtering:** drops rows without ra, dec or a positive distance.
 - **Insolation:** comes from `pl_insol`. Where that's missing, it's computed with EQ-HZ-1 as `10^st_lum / a²`; the archive gives `st_lum` as log₁₀.
 - **Habitable zone:** `in_habitable_zone` means insolation between 0.35 and 1.1 S⊕. It's `NaN` when insolation is unknown.
-- **Planet kind:** set by radius; when the radius is missing, by mass; with neither, `exoplanet_unclassified`.
+- **Planet kind:** set by radius; when the radius is missing, by mass; with neither, `exoplanet_unclassified`, `open_cluster`, `globular_cluster`.
 
   | Kind | Radius | Mass (fallback) |
   | --- | --- | --- |
@@ -142,18 +145,18 @@ Raw catalogs → one entity table, following the field maps in [`docs/data-sourc
 
 ## The entity table
 
-`load_entities` returns a pandas DataFrame with one row per object. The 77 columns (`ENTITY_COLUMNS`) come in three groups:
+`load_entities` returns a pandas DataFrame with one row per object. The 83 columns (`ENTITY_COLUMNS`) come in three groups:
 
 1. **5 identity columns (`IDENTITY_COLUMNS`):** `id`, `name`, `kind`, `data_source`, `parent_star_id`. They carry no provenance.
-2. **24 physical columns (`PHYSICAL_FIELDS`).**
-3. **48 provenance columns:** `F__tier` and `F__conf` for each physical column `F`.
+2. **26 physical columns (`PHYSICAL_FIELDS`).**
+3. **52 provenance columns:** `F__tier` and `F__conf` for each physical column `F`.
 
 **Ids:**
 - HYG stars: `hyg:<HYG id>`. The Sun is `hyg:0`.
 - Exoplanet systems: `exo-sys:<host>`.
 - Planets: `exo:<planet name>`. A planet's `parent_star_id` is its system's id.
 
-**Kinds produced in Phase 0:** `star_main_sequence`, `star_giant`, `star_supergiant`, `white_dwarf`, `star_massive_progenitor`, `star_wolf_rayet`, `planetary_system`, `planet_terrestrial`, `planet_super_earth`, `planet_mini_neptune`, `planet_gas_giant`, `exoplanet_unclassified`.
+**Kinds produced in Phase 0:** `star_main_sequence`, `star_giant`, `star_supergiant`, `white_dwarf`, `star_massive_progenitor`, `star_wolf_rayet`, `planetary_system`, `planet_terrestrial`, `planet_super_earth`, `planet_mini_neptune`, `planet_gas_giant`, `exoplanet_unclassified`, `open_cluster`, `globular_cluster`.
 
 | Physical column | Unit | Filled for | Typical provenance |
 | --- | --- | --- | --- |
@@ -170,7 +173,9 @@ Raw catalogs → one entity table, following the field maps in [`docs/data-sourc
 | `feh` | dex | stars, systems | Modeled 0.40, or Measured 0.85 for archive hosts with `st_met` |
 | `main_sequence_lifetime_myr` | Myr | progenitors | Speculative 0.30 |
 | `t_birth_myr`, `t_collapse_myr` | Myr | progenitors | Speculative 0.10 (scenario values) |
+| `age_myr` | Myr | clusters | Inferred 0.60 |
 | `num_planets`, `num_planets_in_hz` | — | systems | Measured 0.95 / Inferred 0.70 |
+| `num_members` | — | clusters | Inferred 0.80 |
 | `planet_radius_rearth` | R⊕ | planets | Measured 0.85 |
 | `insolation_earth_equiv` | S⊕ | planets | Inferred 0.75 |
 | `in_habitable_zone` | bool | planets | Inferred 0.70 |
@@ -216,18 +221,24 @@ Builds the self-contained Plotly page. Surface height is H; surface color is con
 
 | Function | Description |
 | --- | --- |
-| `galactic_figure(field, grid, groups)` | The galactic-scale surface at t = 0, with one marker layer per entry in `groups` (`{"system": df, "hazard": df, "sun": df}`) |
-| `local_figure(field, grid, animated, static, times, projected=False)` | The local surface with one animation frame per entry in `times`, a slider, and a Play button. `animated` marker groups are recomputed every frame. `static` groups are drawn once at `times[0]`, which keeps the page small when there are thousands of markers |
+| `galactic_figure(field, grid, groups, clouds=())` | The galactic-scale surface at t = 0, with one marker layer per entry in `groups` (`{"system": df, "hazard": df, "sun": df}`), plus any prebuilt traces in `clouds` |
+| `local_figure(field, grid, animated, static, times, projected=False, clouds=())` | The local surface with one animation frame per entry in `times`, a slider, and a Play button. `animated` marker groups are recomputed every frame. `static` groups are drawn once at `times[0]`, which keeps the page small when there are thousands of markers |
 | `write_html(figures, out_path, projected=False)` | Writes one page containing all `figures`, with plotly.js inlined once. It passes `auto_play=False`; otherwise Plotly starts the animation on load |
 | `intro_html(projected=False)` | The page header with honesty notes. The geometry note depends on `projected` |
 | `hover_text(entity, here, t)` | One marker's tooltip: each value shown with its `[tier confidence]`, the least-certain field, H and confidence at the entity, and its data source. Massive stars also show time to collapse |
 | `lowest_confidence(entity)` | `(field, confidence)` of the entity's least-trusted value, or `None` |
+| `point_cloud(label, xyz, field, t, color, size)` | Many points as one light layer, drawn on the veil at their own H, with a one-line tooltip and no per-point text. Used for star kinds and survey samples |
+| `star_clouds(entities, field, t)` | One `point_cloud` per star kind in `STAR_CLOUD_STYLES` |
+| `cluster_markers(entities, field, t)` | Hoverable cluster markers colored by log₁₀ age, with their own color bar on the left |
 
 | Constant | Description |
 | --- | --- |
 | `CONFIDENCE_COLORSCALE` | The red → purple → blue scale |
 | `MARKER_STYLES` | Group → (legend name, color, size, symbol) for `sun`, `hazard` and `system` |
 | `MARKER_LIFT` | 0.015. Markers sit this far above the surface so they stay visible |
+| `STAR_CLOUD_STYLES` | Star kind → (legend name, color) for the point clouds |
+| `CLOUD_POINT_SIZE` | 0.8. Opaque but small: transparency would make WebGL sort every point, which is very slow at this scale |
+| `CLUSTER_AGE_RANGE_LOG_MYR` | (0.5, 4.0), about 3 Myr to 10 Gyr: the cluster color scale |
 | `SLICE_NOTE`, `PROJECTED_NOTE` | The two wordings of the geometry honesty note |
 
 ---
