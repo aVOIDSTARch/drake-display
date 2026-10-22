@@ -87,8 +87,53 @@ class AnisotropicDistance(DistanceMetric):
         return cls(A_rotated)
 
 
+def _split_plane_and_height(diff: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """In-plane radius and |z| of offset vectors. 2D points lie in
+    the plane, so their height is zero."""
+    radius = np.sqrt(np.sum(diff[..., :2] ** 2, axis=-1))
+    if diff.shape[-1] >= 3:
+        height = np.abs(diff[..., 2])
+    else:
+        height = np.zeros_like(radius)
+    return radius, height
+
+
+class CylindricalDistance(DistanceMetric):
+    """
+    Distance from the vertical axis through center: sqrt(dx^2 + dy^2),
+    ignoring z. Centered on the galactic center this is the
+    galactocentric radius R that P-RADIAL and P-INNER are defined on.
+    For 2D points it equals EuclideanDistance.
+    """
+
+    def distance(self, points: np.ndarray, center: np.ndarray) -> np.ndarray:
+        radius, _ = _split_plane_and_height(points - center)
+        return radius
+
+
+class DiskScaledDistance(DistanceMetric):
+    """
+    d = R / h_R + |z| / h_z
+
+    In-plane radius and height, each measured in its own scale length.
+    exp(-d) is then exactly the double-exponential disk density of
+    EQ-PROF-1, so P-DISKDENS is this metric plus ExponentialKernel.
+    """
+
+    def __init__(self, h_R: float, h_z: float):
+        if h_R <= 0 or h_z <= 0:
+            raise ValueError("h_R and h_z must be positive")
+        self.h_R = h_R
+        self.h_z = h_z
+
+    def distance(self, points: np.ndarray, center: np.ndarray) -> np.ndarray:
+        radius, height = _split_plane_and_height(points - center)
+        return radius / self.h_R + height / self.h_z
+
 
 DISTANCE_REGISTRY = {
     "euclidean": EuclideanDistance,
     "anisotropic": AnisotropicDistance,
+    "cylindrical": CylindricalDistance,
+    "disk_scaled": DiskScaledDistance,
 }

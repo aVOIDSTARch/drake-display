@@ -1,0 +1,38 @@
+# Phase 0 galactic-smooth factors (factors.md section 2).
+# Points are galactocentric (x, y[, z]) in kpc; the galactic center is the origin.
+# sign / magnitude / backing are the factors.md starting values -- tune in Step 4.
+
+baseline = 0.0
+
+[[factor]]
+name = "FAC-METAL"            # optimum band: + sign, band-shaped profile
+sign = 1
+magnitude = 1.0
+backing = 0.9
+center = [0.0, 0.0, 0.0]
+kernel = { type = "metallicity_band" }   # EQ-CHEM-1 + placeholder EQ-CHEM-3
+distance = { type = "cylindrical" }
+temporal = { type = "static" }           # G-ENRICH held constant until EQ-CHEM-4
+inputs = { r_gal_kpc = 0.9, feh = 0.5 }  # feh is inferred from the gradient, not measured
+
+[[factor]]
+name = "FAC-DENSITY"
+sign = -1
+magnitude = 0.7
+backing = 0.6
+center = [0.0, 0.0, 0.0]
+kernel = { type = "exponential", scale = 1.0 }
+distance = { type = "disk_scaled", h_R = 2.5, h_z = 0.3 }   # EQ-PROF-1
+temporal = { type = "static" }
+inputs = { r_gal_kpc = 0.9, z_gal_kpc = 0.9 }
+
+[[factor]]
+name = "FAC-AGN"
+sign = -1
+magnitude = 0.8
+backing = 0.5
+center = [0.0, 0.0, 0.0]
+kernel = { type = "logistic_step", radius = 2.5, width = 0.3 }   # P-INNER, R_inner = 2.5 kpc
+distance = { type = "cylindrical" }
+temporal = { type = "static" }
+inputs = { r_gal_kpc = 0.9 }

@@ -1,0 +1,30 @@
+# Phase 0 local-zoom hazards (factors.md FAC-SN), for a +/-0.2 kpc patch.
+# Two HYPOTHETICAL massive stars near the Sun's galactocentric position --
+# hand-placed for the 4D demo, not catalog objects, so their inputs carry
+# low confidence. They sit 60 pc apart so their outer falloffs overlap.
+# Combine with phase0-galactic.toml (LogOddsField.combine), which supplies the
+# (nearly flat, at this scale) smooth background.
+
+baseline = 0.0   # logits add when combined; the galactic file holds B0
+
+[[factor]]
+name = "FAC-SN demo star A (20 Msun)"
+sign = -1
+magnitude = 1.0
+backing = 0.9
+center = [-8.23, 0.0, 0.0]
+kernel = { type = "truncated_inverse_square", kill_radius = 0.010 }   # r_k,SN = 10 pc
+distance = { type = "euclidean" }
+temporal = { type = "ramp_spike_decay", t_birth_myr = 0.0, mass_msun = 20.0, decay_myr = 2.0 }
+inputs = { position = 0.1, mass_msun = 0.1 }   # speculative placement
+
+[[factor]]
+name = "FAC-SN demo star B (15 Msun)"
+sign = -1
+magnitude = 1.0
+backing = 0.9
+center = [-8.17, 0.0, 0.0]
+kernel = { type = "truncated_inverse_square", kill_radius = 0.010 }
+distance = { type = "euclidean" }
+temporal = { type = "ramp_spike_decay", t_birth_myr = 0.0, mass_msun = 15.0, decay_myr = 2.0 }
+inputs = { position = 0.1, mass_msun = 0.1 }
