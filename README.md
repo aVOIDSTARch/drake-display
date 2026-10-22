@@ -57,7 +57,7 @@ The repository is organized as layers that build on one another:
 
 The project is in active design, **fully specified ahead of implementation** — the model, data schema, equation set, and build plan exist before the first line of engine code, by intent.
 
-- **Phase 0 — Prove the model.** Python proof-of-concept: the field math, the coordinate pipeline, and a first time-evolving hazard. *(Built — see [Running Phase 0](#running-phase-0); tuning in progress.)*
+- **Phase 0 — Prove the model.** Python proof-of-concept: the field math, the coordinate pipeline, and a first time-evolving hazard. *(Built and calibrated — see [Running Phase 0](#running-phase-0).)*
 - **Phase 1 — Interactive 3D.** A real rotatable, zoomable, clickable browser application.
 - **Phase 2 — The fourth dimension.** A fully populated galaxy you can scrub through time.
 - **Phase 3 — Real data & honest provenance.** Survey data at scale, with observed-vs-modeled shading.
@@ -73,12 +73,13 @@ Requires Python 3.11+.
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt && pip install -e '.[dev,phase0]'
 python src/main.py          # or: python -m veil   (--help for options)
+python src/main.py --project-hazards   # local view with every nearby hazard projected onto the plane
 pytest                      # unit + Phase 0 acceptance tests
 ```
 
 The first run downloads the HYG v4.1 star catalog and the NASA Exoplanet Archive table into `data/raw/` (with retrieval dates in `data/raw/retrieved.json`). Output goes to `output/phase0/`: `veil.html`, a self-contained interactive page with a rotatable veil, hoverable entities and a time slider, plus static PNGs for quick validation.
 
-**Height is habitability H; color is confidence** (blue = established, purple = mixed, red = speculative). The galactic view shows the favorable annulus carved by the metallicity band against the inner density and core penalties:
+**Height is habitability H; color is confidence** (blue = established, purple = mixed, red = speculative). Every value in the entity table carries its own provenance tier and confidence (ADR-011), shown in the hover text. The galactic view shows the favorable annulus carved by the metallicity band against the inner density and core penalties — H ≈ 0.2 at the core, peaking ≈ 0.75 at the Sun's radius, ≈ 0.4 at the edge (calibration targets, ADR-013):
 
 ![Galactic-scale veil](docs/phase0/galactic.png)
 
@@ -100,7 +101,7 @@ What each module does:
 | `data/curated/phase0_hazard_stars.csv` | Hand-entered masses and **scenario** collapse times for 18 nearby massive stars (speculative, low confidence) |
 | `scripts/phase0_static.py` | Static renders of the synthetic two-star demo in `configs/phase0-local.toml` |
 
-**Known Phase 0 limits.** The metallicity→habitability curve is a placeholder (EQ-CHEM-3); factor magnitudes are untuned starting values; massive-star collapse times are a scenario, not a prediction; the local view is a slice through the Sun's plane, so hazards more than ~50 pc off it leave no dip there.
+**Known Phase 0 limits.** The metallicity→habitability curve is a placeholder (EQ-CHEM-3), so the solar peak is partly built in; factor magnitudes are calibrated to explicit, reviewable targets (ADR-013 and `scripts/calibrate_phase0.py`), which are legibility judgments rather than measurements; massive-star collapse times are a scenario, not a prediction; by default the local view is a true slice through the Sun's plane, so hazards more than ~50 pc off it leave no dip there — `--project-hazards` shows them all, at the cost of overstating their reach (ADR-014).
 
 ## Getting involved
 

@@ -4,7 +4,21 @@ All notable changes to this project are recorded here. Format loosely follows *K
 
 ## [Unreleased] — Design phase
 
-### Added
+### Added — Phase 0 engine
+
+- **Fields library (`src/fields/`):** kernels × distance metrics → spatial profiles; `SourceField` / `CompositeField`; time profiles (static, ramp–spike–decay with the EQ-STAR-1 clock); `Factor` (sign × backing × magnitude × f × g); `LogOddsField`, producing habitability H and the EQ-CORE-4 confidence channel in one pass; galactic and local grids; TOML configs with FATAL/CORRECTABLE validation; matplotlib static rendering.
+- **Phase 0 pipeline (`src/veil/`, `python src/main.py`):** fetches HYG v4.1 and the NASA Exoplanet Archive with recorded retrieval dates; transforms to galactocentric coordinates with the Sun pinned at R₀ = 8.2 kpc; ingests ~120k entities; builds one supernova factor per curated massive star; writes a self-contained interactive Plotly page with entity hover and a time slider.
+- **Graded per-field provenance (ADR-011):** every physical value carries `F__tier` / `F__conf` from its source field map, defaulting to Speculative/0.10; `entity.md` updated and `is_speculative` marked superseded.
+- **Calibration (ADR-013):** baseline and magnitudes fitted to explicit targets, with a reproducible fit script and tests.
+- **Hazard geometry (ADR-014):** true 3D slice by default; `--project-hazards` opt-in projection.
+- **Tests:** 121, including the Phase 0 §6.11 acceptance checks and the calibration targets.
+
+### Fixed
+
+- Config validation overwrote every factor's `distance.angle_rad` with 0.0.
+- The local view auto-played on load, opening part-way through time.
+
+### Added — Design
 
 - **Project identity:** named "The Drake Display"; README and Discussions intro authored.
 - **Research library:** documents on cosmology mysteries, physics mysteries, the Drake equation, the Fermi paradox, the Kardashev scale, DNA & bio-information limits, a stellar compendium, stellar energy & life, galactic hazard distribution, and galactic chemical evolution — each following the seven-section research template with cited sources.
@@ -17,9 +31,7 @@ All notable changes to this project are recorded here. Format loosely follows *K
 
 ### Pending (see `TODO.md`)
 
-- Factor specification (`factors.md`) and the entity-effects matrix.
-- Parameters/constants table and the observable→equation→certainty derivation map.
-- Maintainer contact, versioning scheme, issue/PR templates.
+- Versioning scheme and first-release definition; issue/PR templates.
 - Resolution of the Missing/Partial equations catalogued in `equations.md`.
 
 ---
