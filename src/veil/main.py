@@ -89,6 +89,7 @@ def main(argv=None) -> None:
     sun_rows = entities[entities["id"] == SUN_ID]
     hazards = entities[entities["kind"] == "star_massive_progenitor"]
     systems = entities[entities["kind"] == "planetary_system"]
+    stars = entities[entities["kind"].isin(interactive.STAR_CLOUD_STYLES) & (entities["id"] != SUN_ID)]
     figures = []
 
     if args.view in ("galactic", "both"):
@@ -97,7 +98,8 @@ def main(argv=None) -> None:
                         str(args.out / "galactic.png"), markers=[Marker(sun[0], sun[1], "Sun")])
         grid = make_grid("galactic", spec=GALACTIC_HTML_SPEC)
         figures.append(interactive.galactic_figure(
-            galactic, grid, {"system": systems, "hazard": hazards, "sun": sun_rows}))
+            galactic, grid, {"system": systems, "hazard": hazards, "sun": sun_rows},
+            clouds=interactive.star_clouds(stars, galactic, t=0.0)))
 
     if args.view in ("local", "both"):
         grid = make_grid("local", center=sun, spec=LOCAL_HTML_SPEC)
@@ -108,10 +110,12 @@ def main(argv=None) -> None:
         static_validate(local(grid.points, t=0.0), grid, "Local zoom around the Sun, t = 0",
                         str(args.out / "local_now.png"),
                         markers=[Marker(r.x_gal_kpc, r.y_gal_kpc, r.name) for r in animated["hazard"].itertuples()])
+        local_stars = near(stars, sun, hw)
         figures.append(interactive.local_figure(local, grid, animated, static, times,
-                                                projected=args.project_hazards))
+                                                projected=args.project_hazards,
+                                                clouds=interactive.star_clouds(local_stars, local, times[0])))
         print(f"local view: {len(animated['hazard'])} hazards, {len(static['system'])} exoplanet systems, "
-              f"{len(times)} time steps")
+              f"{len(local_stars):,} stars, {len(times)} time steps")
 
     html = args.out / "veil.html"
     interactive.write_html(figures, html, projected=args.project_hazards)

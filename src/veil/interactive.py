@@ -28,10 +28,20 @@ from .registry import evaluate_at_entities
 CONFIDENCE_COLORSCALE = [[0.0, "rgb(200,30,30)"], [0.5, "rgb(130,40,160)"], [1.0, "rgb(40,70,200)"]]
 MARKER_LIFT = 0.015  # draw entities just above the surface so they aren't buried in it
 
+# Star kinds drawn as point clouds: kind -> (legend name, color). Clouds carry no
+# per-point tooltip, so tens of thousands of points stay light in the page.
+STAR_CLOUD_STYLES = {
+    "star_main_sequence": ("Stars: main sequence (HYG)", "rgb(225,150,20)"),
+    "star_giant": ("Stars: giants (HYG)", "rgb(215,70,35)"),
+    "star_supergiant": ("Stars: supergiants (HYG)", "rgb(140,0,20)"),
+    "white_dwarf": ("Stars: white dwarfs (HYG)", "rgb(80,80,95)"),
+}
+CLOUD_POINT_SIZE = 0.8  # opaque but small: transparency makes WebGL sort every point
+
 # entity group -> (legend name, marker color, size, symbol)
 MARKER_STYLES = {
     "sun": ("Sun", "gold", 7, "diamond"),
-    "hazard": ("Massive progenitors (FAC-SN)", "black", 5, "x"),
+    "hazard": ("Massive progenitors (FAC-SN)", "black", 7, "x"),
     "system": ("Exoplanet systems", "rgb(20,160,120)", 2.5, "circle"),
 }
 
@@ -93,7 +103,7 @@ def _surface(grid: Grid, field: LogOddsField, t: float, showscale: bool = True) 
         z=sample.height.astype(np.float32),
         surfacecolor=sample.confidence.astype(np.float32),
         colorscale=CONFIDENCE_COLORSCALE, cmin=0.0, cmax=1.0,
-        colorbar=dict(title="confidence", len=0.6) if showscale else None,
+        colorbar=dict(title="confidence", len=0.4, y=0.2, yanchor="middle") if showscale else None,
         showscale=showscale,
         hovertemplate="x %{x:.3f} kpc<br>y %{y:.3f} kpc<br>H %{z:.3f}<extra>veil</extra>",
         name="veil",
@@ -114,6 +124,32 @@ def _markers(group: str, entities: pd.DataFrame, field: LogOddsField, t: float) 
     )
 
 
+def point_cloud(label: str, xyz: np.ndarray, field: LogOddsField, t: float, color: str,
+                size: float = CLOUD_POINT_SIZE) -> go.Scatter3d:
+    """Many points, drawn on the veil at their own H, with a one-line tooltip.
+    xyz is (N, 3) galactocentric kpc; works for entities and survey samples alike."""
+    xyz = np.asarray(xyz, dtype=float)
+    z = field(xyz, t).height + MARKER_LIFT
+    return go.Scatter3d(
+        x=xyz[:, 0].astype(np.float32), y=xyz[:, 1].astype(np.float32), z=z.astype(np.float32),
+        mode="markers",
+        marker=dict(size=size, color=color),
+        name=f"{label} ({len(xyz):,})",
+        hovertemplate=f"{label}<br>x %{{x:.3f}} kpc, y %{{y:.3f}} kpc<br>H %{{z:.2f}}<extra></extra>",
+    )
+
+
+def star_clouds(entities: pd.DataFrame, field: LogOddsField, t: float) -> list[go.Scatter3d]:
+    """One point cloud per star kind in STAR_CLOUD_STYLES present in entities."""
+    clouds = []
+    for kind, (label, color) in STAR_CLOUD_STYLES.items():
+        rows = entities[entities["kind"] == kind]
+        if len(rows):
+            xyz = rows[["x_gal_kpc", "y_gal_kpc", "z_gal_kpc"]].to_numpy(dtype=float)
+            clouds.append(point_cloud(label, xyz, field, t, color))
+    return clouds
+
+
 def _scene(grid: Grid) -> dict:
     return dict(
         xaxis=dict(title="x (kpc)", range=[grid.x[0], grid.x[-1]]),
@@ -123,8 +159,10 @@ def _scene(grid: Grid) -> dict:
     )
 
 
-def galactic_figure(field: LogOddsField, grid: Grid, groups: dict[str, pd.DataFrame]) -> go.Figure:
-    traces = [_surface(grid, field, t=0.0)]
+def galactic_figure(field: LogOddsField, grid: Grid, groups: dict[str, pd.DataFrame],
+                    clouds: list[go.Scatter3d] = ()) -> go.Figure:
+    """clouds are prebuilt point_cloud traces, drawn beneath the hoverable markers."""
+    traces = [_surface(grid, field, t=0.0), *clouds]
     traces += [_markers(group, entities, field, t=0.0) for group, entities in groups.items()]
     fig = go.Figure(traces)
     fig.update_layout(title="Galactic-scale veil (smooth factors only, t = 0)",
@@ -134,10 +172,10 @@ def galactic_figure(field: LogOddsField, grid: Grid, groups: dict[str, pd.DataFr
 
 def local_figure(field: LogOddsField, grid: Grid, animated: dict[str, pd.DataFrame],
                  static: dict[str, pd.DataFrame], times: np.ndarray,
-                 projected: bool = False) -> go.Figure:
-    """animated groups are re-evaluated in every frame; static groups are
-    drawn once at times[0] (their hover H is for that time), which keeps
-    the page small when they are numerous."""
+                 projected: bool = False, clouds: list[go.Scatter3d] = ()) -> go.Figure:
+    """animated groups are re-evaluated in every frame; static groups and
+    clouds (prebuilt point_cloud traces) are drawn once at times[0] (their
+    H is for that time), which keeps the page small when they are numerous."""
     trace_ids = list(range(len(animated) + 1))
 
     def frame_traces(t):
@@ -147,7 +185,7 @@ def local_figure(field: LogOddsField, grid: Grid, animated: dict[str, pd.DataFra
     static_traces = [_markers(g, e, field, times[0]) for g, e in static.items()]
     for trace in static_traces:
         trace.name += f" (H at t = {times[0]:g})"
-    fig = go.Figure(data=list(frames[0].data) + static_traces, frames=frames)
+    fig = go.Figure(data=list(frames[0].data) + static_traces + list(clouds), frames=frames)
 
     step_args = lambda name: [[name], dict(mode="immediate", frame=dict(duration=0, redraw=True),
                                             transition=dict(duration=0))]

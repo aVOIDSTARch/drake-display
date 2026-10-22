@@ -89,3 +89,27 @@ def test_animated_page_does_not_autoplay(paths, tmp_path):  # noqa: F811
     # plotly's default auto_play emits a Plotly.animate call that starts the
     # slider moving on load, so the page opened part-way through time
     assert "Plotly.animate" not in out.read_text(encoding="utf-8")
+
+
+def test_point_cloud_sits_on_the_veil_without_per_point_tooltips(paths):  # noqa: F811
+    entities = load_entities(paths)
+    galactic, _ = build_fields(entities, CONFIGS)
+    xyz = np.array([[-8.2, 0.0, 0.0], [0.0, 0.0, 0.0], [5.0, 5.0, 0.0]])
+
+    trace = interactive.point_cloud("Test points", xyz, galactic, t=0.0, color="red")
+
+    np.testing.assert_allclose(trace.z, galactic(xyz, 0.0).height + interactive.MARKER_LIFT, rtol=1e-6)
+    assert trace.hovertext is None
+    assert trace.name == "Test points (3)"
+
+
+def test_star_clouds_make_one_layer_per_star_kind(paths):  # noqa: F811
+    entities = load_entities(paths)
+    galactic, _ = build_fields(entities, CONFIGS)
+    stars = entities[entities["kind"].isin(interactive.STAR_CLOUD_STYLES)]
+
+    clouds = interactive.star_clouds(stars, galactic, t=0.0)
+
+    kinds_present = [k for k in interactive.STAR_CLOUD_STYLES if (stars["kind"] == k).any()]
+    assert len(clouds) == len(kinds_present)
+    assert sum(len(c.x) for c in clouds) == len(stars)
