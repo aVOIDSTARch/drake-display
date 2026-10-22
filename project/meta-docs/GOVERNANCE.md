@@ -4,7 +4,7 @@ How decisions get made, who makes them, and how disagreements resolve. Kept deli
 
 ## Roles
 
-- **Maintainer / Lead** — the project author; holds final say on scope, direction, and merges; owns the charter and roadmap. *(Currently a single person; may expand.)*
+- **Maintainer / Lead** — the project author; holds final say on scope, direction, and merges; owns the charter and roadmap; keeps the credit record (`AUTHORS.md`, `CITATION.cff`) current per the policy in `CONTRIBUTING.md`. *(Currently a single person; may expand.)*
 - **Science reviewers** — contributors trusted to vet the research library and coefficient proposals for scientific soundness and honest sourcing.
 - **Build contributors** — those working on the engine.
 - **Contributors** — anyone opening issues, discussions, or pull requests. No formal barrier to entry.

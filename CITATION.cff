@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+message: >-
+  If you use The Drake Display's model, code, or research library, please
+  cite it using the metadata below. Contributors by track are listed in
+  project/meta-docs/AUTHORS.md.
+title: The Drake Display
+type: software
+authors:
+  - given-names: Louie
+    family-names: Casinelli
+repository-code: "https://github.com/aVOIDSTARch/drake-display"
+abstract: >-
+  A hazard-aware extension of the Drake equation in space and time: a
+  log-odds habitability field over the Milky Way that combines positive and
+  negative factors, each with a science-backing weight and a propagated
+  confidence, driven by real stellar and exoplanet catalogs, with a time
+  axis for evolving hazards.
+keywords:
+  - astrobiology
+  - galactic habitable zone
+  - Drake equation
+  - habitability
+  - astronomy
+  - visualization
+license:
+  - MIT
+  - CC-BY-4.0
+version: 0.1.0

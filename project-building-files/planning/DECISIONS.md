@@ -121,3 +121,18 @@ Fit, with signs, backings and profiles unchanged and the `FAC-DENSITY : FAC-AGN`
 **Rationale:** It matches the existing GitHub repository name, keeps the full name recognisable, and drops the article, which slugs conventionally omit.
 **Rules out:** Other slugs for the same project (e.g. the internal library name `fields` as the distribution name).
 **Enacted by:** `pyproject.toml` (`name`), the GitHub repository `aVOIDSTARch/drake-display`.
+
+## ADR-017 — Attribution and credit policy
+
+**Decision:** Contributions are credited where they belong, by kind:
+
+- **`AUTHORS.md`** (`project/meta-docs/`) lists contributors grouped by track — Science, Model, Build, Worldbuilding — each with a one-line note. Listing is opt-in, under the name or handle the contributor chooses.
+- **Code** is credited by the git history, with `Co-authored-by` trailers for paired work.
+- **Scientific contributions** (coefficients, corrections, sources) are also credited inline in the document or `factors.md` entry that uses them.
+- **`CITATION.cff`** at the repository root gives the citation metadata (MIT and CC-BY-4.0), kept in step with `AUTHORS.md` by the maintainer.
+- **Worldbuilding** contributions are credited in the repository; credit within the All-Rights-Reserved fiction (ADR-010) is at the author's discretion and is not promised.
+- **AI-assisted work** is disclosed, for code via a `Co-Authored-By` trailer.
+
+**Rationale:** The project's three tracks produce different kinds of work, and one list can't credit them all well: commits already record code precisely, while a science contribution is only meaningful next to the number it changed — the same reason every value carries its own confidence. Opt-in naming respects contributors who don't want a legal name in a public repository. Separating repository credit from credit in the fiction keeps the creative work's rights clear and avoids a promise the license doesn't make. Disclosing AI assistance follows from the honesty standard: provenance applies to authorship too.
+**Rules out:** Listing people without consent; a single undifferentiated contributor list; implied credit in the published fiction; undisclosed AI-drafted work.
+**Enacted by:** `project/meta-docs/AUTHORS.md`, `CITATION.cff`, `CONTRIBUTING.md` (Credit), `GOVERNANCE.md`, `LICENSE-CONTENT`.

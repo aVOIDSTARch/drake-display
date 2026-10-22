@@ -11,7 +11,7 @@ Open items surfaced by the project-management documents and the model-definition
 - [x] **Repository hosting details.** ✅ GitHub, public: <https://github.com/aVOIDSTARch/drake-display>, with Discussions, Issues, and Wiki all enabled. The Discussions intro needed no changes. *(Surfaced by: discussions-intro, README.)*
 - [x] **Versioning scheme & first-release definition.** ✅ Semantic versioning (ADR-015); `v0.1.0` = a working Phase 0 that passes its acceptance tests. That bar is now met; cutting the release is a separate step. *(Surfaced by: CHANGELOG.)*
 - [ ] **Project short name / handle & repo tagline.** Short slug ✅ `drake-display` (ADR-016). **Still open:** confirm the one-line repo description (draft: *"A hazard-aware, four-dimensional extension of the Drake equation — mapping where and when the Milky Way could hold life."*). *(Surfaced by: ADR-001, README.)*
-- [ ] **Attribution/credits policy.** How contributors (science, code, worldbuilding) are credited. *(Surfaced by: GOVERNANCE, CONTRIBUTING.)*
+- [x] **Attribution/credits policy.** ✅ ADR-017: opt-in `AUTHORS.md` grouped by track, git history and `Co-authored-by` trailers for code, inline credit where scientific contributions are used, `CITATION.cff` for citing the project, worldbuilding credited in the repo with novel credit at the author's discretion. Written into `CONTRIBUTING.md` (Credit) and `GOVERNANCE.md`. *(Surfaced by: GOVERNANCE, CONTRIBUTING.)*
 
 ## Documents / artifacts to complete
 

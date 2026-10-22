@@ -13,6 +13,9 @@ All notable changes to this project are recorded here. Format loosely follows *K
 - **Hazard geometry (ADR-014):** true 3D slice by default; `--project-hazards` opt-in projection.
 - **Tests:** 121, including the Phase 0 §6.11 acceptance checks and the calibration targets.
 
+- **Credit (ADR-017):** `AUTHORS.md` (by track, opt-in), `CITATION.cff`, and a Credit section in `CONTRIBUTING.md`.
+- **Versioning and slug (ADR-015, ADR-016):** semantic versioning with `v0.1.0` = Phase 0 passing its acceptance tests; slug `drake-display`.
+
 ### Fixed
 
 - Config validation overwrote every factor's `distance.angle_rad` with 0.0.
