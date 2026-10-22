@@ -30,9 +30,34 @@ EXOPLANET_URL = "https://exoplanetarchive.ipac.caltech.edu/TAP/sync?" + urllib.p
     "format": "csv",
 })
 
+VIZIER_TAP = "https://tapvizier.cds.unistra.fr/TAPVizieR/tap/sync"
+
+
+def vizier_url(query: str) -> str:
+    """A VizieR TAP synchronous query returning CSV."""
+    return VIZIER_TAP + "?" + urllib.parse.urlencode({
+        "REQUEST": "doQuery", "LANG": "ADQL", "FORMAT": "csv", "MAXREC": 1_000_000, "QUERY": query,
+    })
+
+
+# Massive-star catalogs (source-galactic-wr-catalogue.md, source-als-iii.md)
+WR_FILE = "wolf_rayet_rate_crowther_2020.csv"
+WR_URL = vizier_url(
+    # E_Dist / e_Dist differ only by case, and ADQL names are case-insensitive unless quoted
+    'SELECT WR, SpType, Name, RA_ICRS, DE_ICRS, Dist, "E_Dist", "e_Dist", logL '
+    'FROM "J/MNRAS/493/1512/table1"'
+)
+OB_FILE = "als_iii_ob_stars.csv"
+OB_URL = vizier_url(
+    'SELECT ALS, GaiaDR2, GOSC, RAJ2000, DEJ2000, DistP50, DistP16, DistP84, SpType '
+    'FROM "J/MNRAS/504/2968/tablea1"'
+)
+
 SOURCES = {
     HYG_FILE: HYG_URL,
     EXOPLANET_FILE: EXOPLANET_URL,
+    WR_FILE: WR_URL,
+    OB_FILE: OB_URL,
 }
 
 

@@ -21,9 +21,9 @@ from fields.render import Marker, static_validate
 
 from . import interactive
 from .coords import R0_KPC
-from .fetch import EXOPLANET_FILE, HYG_FILE, fetch_missing
+from .fetch import EXOPLANET_FILE, HYG_FILE, OB_FILE, WR_FILE, fetch_missing
 from .ingest import load_entities
-from .registry import build_fields, near
+from .registry import HAZARD_KINDS, build_fields, hazards_reaching, near
 
 REPO = Path(__file__).resolve().parents[2]
 RAW = REPO / "data" / "raw"
@@ -65,7 +65,7 @@ def main(argv=None) -> None:
     args.out.mkdir(parents=True, exist_ok=True)
 
     if args.no_fetch:
-        missing = [f for f in (HYG_FILE, EXOPLANET_FILE) if not (RAW / f).exists()]
+        missing = [f for f in (HYG_FILE, EXOPLANET_FILE, WR_FILE, OB_FILE) if not (RAW / f).exists()]
         if missing:
             raise SystemExit(f"missing raw data {missing}; run without --no-fetch to download")
     else:
@@ -75,6 +75,8 @@ def main(argv=None) -> None:
         "hyg": RAW / HYG_FILE,
         "exoplanets": RAW / EXOPLANET_FILE,
         "hazards": REPO / "data" / "curated" / "phase0_hazard_stars.csv",
+        "wolf_rayet": RAW / WR_FILE,
+        "ob_stars": RAW / OB_FILE,
     })
     PROCESSED.mkdir(parents=True, exist_ok=True)
     entities.to_csv(PROCESSED / "entities.csv", index=False)
@@ -82,12 +84,13 @@ def main(argv=None) -> None:
     print(entities["kind"].value_counts().to_string())
 
     sun = check_sun(entities)
-    galactic, local = build_fields(entities, CONFIGS, project_hazards=args.project_hazards)
+    galactic, local = build_fields(entities, CONFIGS, project_hazards=args.project_hazards,
+                                   local_patch=(sun, LOCAL_HTML_SPEC.half_width_kpc))
     print(f"registry: {len(galactic.factors)} galactic factors, "
-          f"{len(local.factors) - len(galactic.factors)} point hazards")
+          f"{len(local.factors) - len(galactic.factors)} point hazards reach the local view")
 
     sun_rows = entities[entities["id"] == SUN_ID]
-    hazards = entities[entities["kind"] == "star_massive_progenitor"]
+    hazards = entities[entities["kind"].isin(HAZARD_KINDS)]
     systems = entities[entities["kind"] == "planetary_system"]
     stars = entities[entities["kind"].isin(interactive.STAR_CLOUD_STYLES) & (entities["id"] != SUN_ID)]
     figures = []
@@ -109,7 +112,8 @@ def main(argv=None) -> None:
         times = np.round(np.arange(0.0, args.t_end + args.t_step / 2, args.t_step), 6)
         static_validate(local(grid.points, t=0.0), grid, "Local zoom around the Sun, t = 0",
                         str(args.out / "local_now.png"),
-                        markers=[Marker(r.x_gal_kpc, r.y_gal_kpc, r.name) for r in animated["hazard"].itertuples()])
+                        markers=[Marker(r.x_gal_kpc, r.y_gal_kpc, r.name) for r in
+                                 hazards_reaching(entities, sun, hw, args.project_hazards).itertuples()])
         local_stars = near(stars, sun, hw)
         figures.append(interactive.local_figure(local, grid, animated, static, times,
                                                 projected=args.project_hazards,

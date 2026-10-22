@@ -27,6 +27,11 @@ SN_MAGNITUDE = 3.7  # calibrated, DECISIONS.md ADR-013
 SN_BACKING = 0.9
 SN_KILL_RADIUS_KPC = 0.010
 SN_DECAY_MYR = 2.0
+SN_CUTOFF_FACTOR = 5.0  # TruncatedInverseSquareKernel's default: no effect beyond 5 kill radii
+SN_REACH_KPC = SN_CUTOFF_FACTOR * SN_KILL_RADIUS_KPC
+
+# Entity kinds that end in a core-collapse supernova and get a FAC-SN factor
+HAZARD_KINDS = ("star_massive_progenitor", "star_wolf_rayet")
 
 
 def supernova_factor(entity: pd.Series, project_onto_plane: bool = False) -> Factor:
@@ -41,7 +46,7 @@ def supernova_factor(entity: pd.Series, project_onto_plane: bool = False) -> Fac
     metric = CylindricalDistance() if project_onto_plane else EuclideanDistance()
     return Factor(
         name=f"FAC-SN {entity['name']}",
-        spatial=SourceField(metric, TruncatedInverseSquareKernel(SN_KILL_RADIUS_KPC),
+        spatial=SourceField(metric, TruncatedInverseSquareKernel(SN_KILL_RADIUS_KPC, SN_CUTOFF_FACTOR),
                             center=center, name=entity["name"]),
         sign=SN_SIGN,
         backing=SN_BACKING,
@@ -55,17 +60,36 @@ def supernova_factor(entity: pd.Series, project_onto_plane: bool = False) -> Fac
     )
 
 
+def hazards_reaching(entities: pd.DataFrame, center, half_width_kpc: float,
+                     project_onto_plane: bool = False) -> pd.DataFrame:
+    """Hazard entities whose supernova can affect a square patch of the plane
+    z = center[2]: within SN_REACH_KPC of it in x and y, and (unless
+    projected) in z. Everything else contributes exactly zero there."""
+    hazards = entities[entities["kind"].isin(HAZARD_KINDS)]
+    reach = half_width_kpc + SN_REACH_KPC
+    inside = ((np.abs(hazards["x_gal_kpc"] - center[0]) <= reach)
+              & (np.abs(hazards["y_gal_kpc"] - center[1]) <= reach))
+    if not project_onto_plane:
+        inside &= np.abs(hazards["z_gal_kpc"] - center[2]) <= SN_REACH_KPC
+    return hazards[inside]
+
+
 def build_hazard_field(entities: pd.DataFrame, project_onto_plane: bool = False) -> LogOddsField:
-    progenitors = entities[entities["kind"] == "star_massive_progenitor"]
+    progenitors = entities[entities["kind"].isin(HAZARD_KINDS)]
     return LogOddsField([supernova_factor(row, project_onto_plane) for _, row in progenitors.iterrows()],
                         baseline=0.0)
 
 
-def build_fields(entities: pd.DataFrame, config_dir: Path,
-                 project_hazards: bool = False) -> tuple[LogOddsField, LogOddsField]:
+def build_fields(entities: pd.DataFrame, config_dir: Path, project_hazards: bool = False,
+                 local_patch: tuple | None = None) -> tuple[LogOddsField, LogOddsField]:
     """(galactic, local): the smooth whole-disk field, and that same field
-    plus every point hazard, for the local-zoom regime (ADR-004)."""
+    plus point hazards, for the local-zoom regime (ADR-004). With
+    local_patch = (center, half_width_kpc), only the hazards that can reach
+    that patch are included -- with thousands of catalog hazards, evaluating
+    every one over every cell and frame would be far too slow."""
     galactic = load_log_odds_field_from_path(str(config_dir / "phase0-galactic.toml"))
+    if local_patch is not None:
+        entities = hazards_reaching(entities, *local_patch, project_onto_plane=project_hazards)
     local = LogOddsField.combine([galactic, build_hazard_field(entities, project_hazards)])
     return galactic, local
 

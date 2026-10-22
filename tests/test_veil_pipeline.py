@@ -9,6 +9,7 @@ pytest.importorskip("astropy")
 from veil.coords import R0_KPC, to_galactocentric  # noqa: E402
 from veil.ingest import (  # noqa: E402
     MEASURED,
+    STATISTICAL,
     MODELED,
     PHYSICAL_FIELDS,
     SPECULATIVE,
@@ -281,3 +282,98 @@ def test_build_fields_passes_projection_through(paths):
     _, projected = build_fields(entities, configs, project_hazards=True)
     assert isinstance(sliced.factors[-1].spatial.distance_metric, EuclideanDistance)
     assert isinstance(projected.factors[-1].spatial.distance_metric, CylindricalDistance)
+
+
+# ---- catalog hazards: Wolf-Rayet and ALS III ----
+
+WR_CSV = """WR,SpType,Name,RA_ICRS,DE_ICRS,Dist,E_Dist,e_Dist,logL
+"WR1","WN4b","HD 4004",10.868291666666666,64.75983333333332,3.15,0.47,0.36,
+"WR11","WC8 + O7.5III","gam2 Vel",122.383,-47.337,0.34,0.05,0.04,5.31
+"WR999","WN6","",200.0,-10.0,,,,
+"""
+OB_CSV = """ALS,GaiaDR2,GOSC,RAJ2000,DEJ2000,DistP50,DistP16,DistP84,SpType
+1,1,"HD 46223",97.97,4.83,1500.0,1400.0,1600.0,"O4V((f))"
+2,2," ",100.0,5.0,800.0,750.0,850.0,"B7III, B8V"
+3,3," ",101.0,6.0,900.0,850.0,950.0," "
+4,4," ",201.298,-11.161,77.0,75.0,79.0,"B1V"
+5,5," ",102.0,7.0,2000.0,1900.0,2100.0,"B0Ia"
+"""
+
+
+@pytest.fixture
+def catalog_paths(paths, tmp_path):
+    (tmp_path / "wr.csv").write_text(WR_CSV)
+    (tmp_path / "ob.csv").write_text(OB_CSV)
+    return {**paths, "wolf_rayet": tmp_path / "wr.csv", "ob_stars": tmp_path / "ob.csv"}
+
+
+@pytest.mark.parametrize("spect,low,high", [
+    ("O3V", 55, 65), ("B0V", 13, 17), ("B2.5V", 7.5, 8.5), ("B0Ia", 22, 30), ("O5/6III", 40, 50),
+])
+def test_ob_mass_calibration(spect, low, high):
+    from veil.ingest import estimate_ob_mass
+    assert low <= estimate_ob_mass(spect) <= high
+
+
+@pytest.mark.parametrize("spect", ["OB", "A0V", "", None, "WN6"])
+def test_unreadable_spectral_types_give_no_mass(spect):
+    from veil.ingest import estimate_ob_mass
+    assert np.isnan(estimate_ob_mass(spect))
+
+
+def test_clock_draws_are_reproducible_and_independent():
+    from veil.ingest import draw_clocks
+    ids = pd.Series(["als:1", "als:2", "als:3"])
+    a = draw_clocks(ids, remaining_myr_max=0.5)
+    b = draw_clocks(ids, remaining_myr_max=0.5)
+    pd.testing.assert_series_equal(a, b)
+    assert ((a >= 0) & (a <= 0.5)).all()
+    # one star's draw doesn't depend on which others are present
+    assert draw_clocks(pd.Series(["als:2"]), remaining_myr_max=0.5).iloc[0] == a.iloc[1]
+
+
+def test_wolf_rayet_loader(catalog_paths):
+    from veil.ingest import load_wolf_rayet
+    wr = load_wolf_rayet(catalog_paths["wolf_rayet"]).set_index("id")
+    assert list(wr.index) == ["wr:WR1", "wr:WR11"]           # WR999 has no distance
+    assert wr.loc["wr:WR1", "distance_pc"] == 3150.0          # kpc -> pc
+    assert wr.loc["wr:WR11", "name"] == "WR11 (gam2 Vel)"
+    assert (wr["kind"] == "star_wolf_rayet").all()
+    assert (wr["t_collapse_myr"].between(0, 0.5)).all()
+    assert (wr["t_birth_myr"] < 0).all()
+    assert (wr["t_collapse_myr__tier"] == STATISTICAL).all()
+    assert (wr["mass_msun__tier"] == SPECULATIVE).all()
+
+
+def test_ob_loader_keeps_only_core_collapse_progenitors(catalog_paths):
+    from veil.ingest import load_ob_stars
+    ob = load_ob_stars(catalog_paths["ob_stars"]).set_index("id")
+    # ALS 2 (~5 Msun) is too light; ALS 3 has no spectral type
+    assert sorted(ob.index) == ["als:1", "als:4", "als:5"]
+    assert ob.loc["als:1", "name"] == "HD 46223 (ALS 1)"
+    assert (ob["mass_msun"] >= 8).all()
+    assert (ob["mass_msun__tier"] == MODELED).all()
+    remaining = ob["t_collapse_myr"] / ob["main_sequence_lifetime_myr"]
+    assert remaining.between(0, 1).all()
+
+
+def test_catalog_duplicates_are_dropped_by_sky_position(catalog_paths):
+    entities = load_entities(catalog_paths)
+    # ALS 4 sits on Spica, already a curated hazard: kept once, as the curated row
+    assert "als:4" not in set(entities["id"])
+    assert (entities["name"] == "Spica").sum() == 1
+    hazards = entities[entities["kind"].isin(["star_massive_progenitor", "star_wolf_rayet"])]
+    assert set(hazards["id"]) >= {"hyg:2", "wr:WR1", "als:1", "als:5"}
+    assert entities["id"].is_unique
+
+
+def test_hazards_reaching_culls_to_the_patch(catalog_paths):
+    from veil.registry import SN_REACH_KPC, hazards_reaching
+    entities = load_entities(catalog_paths)
+    sun = np.array([-8.2, 0.0, 0.02])
+    reaching = hazards_reaching(entities, sun, 0.25)
+    assert (np.abs(reaching["x_gal_kpc"] - sun[0]) <= 0.25 + SN_REACH_KPC).all()
+    assert (np.abs(reaching["z_gal_kpc"] - sun[2]) <= SN_REACH_KPC).all()
+    far = entities[entities["id"] == "wr:WR1"]  # ~3 kpc away
+    assert far["id"].iloc[0] not in set(reaching["id"])
+    assert len(hazards_reaching(entities, sun, 0.25, project_onto_plane=True)) >= len(reaching)

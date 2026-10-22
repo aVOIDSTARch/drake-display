@@ -83,10 +83,10 @@ def hover_text(entity: pd.Series, here: pd.Series, t: float) -> str:
     ]
     if entity["kind"] == "planetary_system":
         lines.append(f"planets {int(entity['num_planets'])}, in HZ {int(entity['num_planets_in_hz'])}")
-    if entity["kind"] == "star_massive_progenitor":
+    if not _is_missing(entity.get("t_collapse_myr")):
         remaining = entity["t_collapse_myr"] - t
         status = f"collapse in {remaining:.2f} Myr" if remaining > 0 else f"collapsed {-remaining:.2f} Myr ago"
-        lines.append(f"{status} [scenario clock: {entity['t_collapse_myr__tier']} "
+        lines.append(f"{status} [clock: {entity['t_collapse_myr__tier']} "
                      f"{entity['t_collapse_myr__conf']:.2f}]")
     weakest = lowest_confidence(entity)
     if weakest is not None:
@@ -219,8 +219,10 @@ def intro_html(projected: bool = False) -> str:
 <p>Height is habitability <i>H</i> (log-odds factor model); color is confidence
 (blue = well established, purple = mixed, red = speculative). Hover any marker for its data
 and provenance.</p>
-<p><b>Honesty notes.</b> The metallicity band is a placeholder (EQ-CHEM-3). Massive-star masses
-and collapse times are hand-assigned scenario values, not predictions.
+<p><b>Honesty notes.</b> The metallicity band is a placeholder (EQ-CHEM-3). Massive stars come
+from two catalogs (Wolf-Rayet and ALS III) plus a short hand-made list. Their masses are estimated
+from spectral type, and because their ages are unknown, each collapse time is one random draw
+from a plausible range — a statistical scenario, not a prediction.
 {PROJECTED_NOTE if projected else SLICE_NOTE}</p>
 """
 

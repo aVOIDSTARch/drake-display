@@ -7,6 +7,8 @@ the field maps in docs/data-sources/:
     load_hyg          stars from HYG (positions measured; mass, teff,
                       luminosity estimated; feh modeled from the gradient)
     load_hazards      curated massive stars, joined to HYG by Hipparcos number
+    load_wolf_rayet   Galactic Wolf-Rayet stars (Rate & Crowther 2020)
+    load_ob_stars     O and early-B stars massive enough to explode (ALS III)
     load_exoplanets   planetary systems + planets from the NASA Exoplanet Archive
     load_entities     all of the above, one row per entity
 
@@ -17,11 +19,15 @@ from the per-source field maps below. A present value with no stated
 provenance is Speculative / 0.10 -- uncertainty is the default. These
 confidences are the input side of EQ-CORE-4.
 
-Entity resolution between sources is a no-op in Phase 0 (pipeline-idea-v2
-3.2): exoplanet hosts are kept as their own planetary_system entities.
+Full entity resolution between sources is Phase 3 work (ADR-012):
+exoplanet hosts are kept as their own planetary_system entities. The one
+exception is massive stars, which several catalogs list: duplicates are
+dropped by sky position, keeping curated > Wolf-Rayet > ALS III > HYG, so
+each hazard appears, and dips the veil, exactly once.
 """
 
 import re
+import zlib
 from pathlib import Path
 
 import numpy as np
@@ -33,11 +39,20 @@ from fields.temporal import ms_lifetime_myr
 
 from .coords import to_galactocentric
 
+import astropy.units as u
+from astropy.coordinates import SkyCoord
+
 HYG_UNKNOWN_DISTANCE_PC = 100000  # HYG sentinel for "distance unknown"
 SOLAR_ABSMAG_V = 4.83
 MASS_LUMINOSITY_EXPONENT = 3.5    # L ~ M^3.5, main sequence only
 HZ_FLUX_INNER = 1.1               # S_inner, factors.md Appendix A
 HZ_FLUX_OUTER = 0.35              # S_outer
+
+CORE_COLLAPSE_MIN_MASS_MSUN = 8.0    # lightest star that ends as a core-collapse supernova
+WR_PROGENITOR_MASS_MSUN = 30.0       # typical initial mass of a Wolf-Rayet star's progenitor
+WR_MAX_REMAINING_MYR = 0.5           # the Wolf-Rayet phase lasts a few hundred thousand years
+DUPLICATE_RADIUS_ARCSEC = 5.0        # same star in two catalogs, allowing for epoch differences
+CLOCK_SEED = 20261022                # fixes the statistical clock draws (see draw_clocks)
 
 # Provenance tiers, schema-field-definition.md section 3
 MEASURED = "Measured"
@@ -109,6 +124,46 @@ EXOPLANET_FIELD_MAP = {
 }
 MODELED_FEH = (MODELED, 0.40)
 
+# docs/data-sources/source-galactic-wr-catalogue.md
+WR_FIELD_MAP = {
+    "ra_icrs_deg": (MEASURED, 0.98),
+    "dec_icrs_deg": (MEASURED, 0.98),
+    "distance_pc": (INFERRED, 0.70),   # Bayesian distance from a Gaia DR2 parallax
+    **_with_position((INFERRED, 0.70)),
+    "spectral_type": (MEASURED, 0.85),
+    "luminosity_lsun": (INFERRED, 0.60),
+    "mass_msun": (SPECULATIVE, 0.20),  # a typical progenitor mass, not this star's
+    "main_sequence_lifetime_myr": (SPECULATIVE, 0.20),
+    "t_collapse_myr": (STATISTICAL, 0.30),
+    "t_birth_myr": (STATISTICAL, 0.30),
+}
+
+# docs/data-sources/source-als-iii.md
+OB_FIELD_MAP = {
+    "ra_icrs_deg": (MEASURED, 0.98),
+    "dec_icrs_deg": (MEASURED, 0.98),
+    "distance_pc": (INFERRED, 0.75),   # Bayesian distance from a Gaia EDR3 parallax
+    **_with_position((INFERRED, 0.75)),
+    "spectral_type": (MEASURED, 0.80),
+    "mass_msun": (MODELED, 0.30),      # from spectral type via an approximate calibration
+    "main_sequence_lifetime_myr": (MODELED, 0.30),
+    "t_collapse_myr": (STATISTICAL, 0.30),
+    "t_birth_myr": (STATISTICAL, 0.30),
+}
+
+# Approximate initial masses (Msun) by spectral subtype, for three luminosity
+# groups. Subtype index: O3 = 3 ... O9.5 = 9.5, B0 = 10 ... B9 = 19. Values are
+# rounded from standard calibrations (e.g. Martins et al. 2005 for O stars) and
+# are Modeled / 0.30: good to a factor of ~1.5, enough to tell a supernova
+# progenitor from a star that won't explode, not to time its death precisely.
+_MASS_CALIBRATION = {
+    "dwarf": {3: 60, 4: 48, 5: 37, 6: 30, 7: 25, 8: 21, 9: 18, 9.5: 16, 10: 15, 10.5: 13,
+              11: 11, 11.5: 10, 12: 9, 12.5: 8, 13: 7, 15: 5.5, 17: 4.2, 18: 3.8, 19: 3.2},
+    "giant": {3: 65, 5: 45, 7: 30, 9: 23, 10: 18, 11: 15, 12: 12, 13: 9.5, 15: 7, 18: 5, 19: 4.5},
+    "supergiant": {3: 70, 5: 55, 7: 40, 9: 30, 10: 26, 11: 23, 12: 20, 13: 17, 15: 15, 18: 13, 19: 12},
+}
+_OB_SUBTYPE = re.compile(r"^\s*([OB])\s*(\d+(?:\.\d+)?)")
+
 _LUMINOSITY_CLASS = re.compile(r"\d(?:\.\d+)?\s*(Iab|Ia|Ib|III|II|IV|VI|V|I)(?![a-z]*[IV])")
 _GRADIENT = MetallicityBandKernel()  # holds EQ-CHEM-1 with the Appendix A constants
 
@@ -163,6 +218,53 @@ def classify_star(spectral_type) -> str:
     if lum_class in ("II", "III"):
         return "star_giant"
     return "star_main_sequence"
+
+
+def estimate_ob_mass(spectral_type) -> float:
+    """Approximate initial mass of an O or B star from its spectral type, or
+    NaN if the type can't be read (not O/B, or no numeric subtype). Multiple
+    classifications ("B7III, B8V") use the first; ranges ("O5/6") use the
+    earlier subtype; a missing luminosity class counts as a dwarf."""
+    if not isinstance(spectral_type, str):
+        return np.nan
+    first = spectral_type.split(",")[0]
+    match = _OB_SUBTYPE.match(first)
+    if not match:
+        return np.nan
+    index = float(match.group(2)) + (10.0 if match.group(1) == "B" else 0.0)
+    lum_class = luminosity_class(first)
+    group = ("supergiant" if lum_class in ("I", "Ia", "Iab", "Ib")
+             else "giant" if lum_class in ("II", "III") else "dwarf")
+    table = _MASS_CALIBRATION[group]
+    xs = np.array(sorted(table))
+    log_masses = np.log([table[x] for x in xs])
+    return float(np.exp(np.interp(index, xs, log_masses)))
+
+
+def draw_clocks(ids: pd.Series, remaining_fraction_max: float | None = None,
+                lifetimes: pd.Series | None = None,
+                remaining_myr_max: float | None = None) -> pd.Series:
+    """Statistical collapse times, in Myr from now, for stars whose ages are
+    unknown. Each star gets its own reproducible draw, seeded by its id, so
+    adding a star never reshuffles the others. Either a uniform fraction of
+    the star's lifetime remains (pass lifetimes), or a uniform time up to
+    remaining_myr_max (for stars in a short final phase)."""
+    draws = np.array([np.random.default_rng([CLOCK_SEED, zlib.crc32(i.encode())]).random()
+                      for i in ids])
+    if lifetimes is not None:
+        return pd.Series(draws * lifetimes.to_numpy(), index=ids.index)
+    return pd.Series(draws * remaining_myr_max, index=ids.index)
+
+
+def drop_sky_duplicates(rows: pd.DataFrame, against: pd.DataFrame,
+                        radius_arcsec: float = DUPLICATE_RADIUS_ARCSEC) -> pd.DataFrame:
+    """rows with no counterpart in against within radius_arcsec on the sky."""
+    if rows.empty or against.empty:
+        return rows
+    mine = SkyCoord(rows["ra_icrs_deg"].to_numpy() * u.deg, rows["dec_icrs_deg"].to_numpy() * u.deg)
+    theirs = SkyCoord(against["ra_icrs_deg"].to_numpy() * u.deg, against["dec_icrs_deg"].to_numpy() * u.deg)
+    _, separation, _ = mine.match_to_catalog_sky(theirs)
+    return rows[separation.arcsec > radius_arcsec]
 
 
 def load_hyg(path: Path) -> pd.DataFrame:
@@ -221,11 +323,74 @@ def load_hazards(path: Path, stars: pd.DataFrame) -> pd.DataFrame:
     df["data_source"] = "HYG v4.1 + curated Phase 0 hazard list"
     df["main_sequence_lifetime_myr"] = df["mass_msun"].map(ms_lifetime_myr)
     df["t_birth_myr"] = df["t_collapse_myr"] - df["main_sequence_lifetime_myr"]
+    _check_born(df)
+    return attach_provenance(df, HAZARD_FIELD_MAP)
+
+
+def _check_born(df: pd.DataFrame) -> None:
     unborn = df.loc[df["t_birth_myr"] > 0, "name"].tolist()
     if unborn:
         raise ValueError(f"t_collapse_myr is later than the EQ-STAR-1 lifetime allows, so these "
                          f"stars would be born in the future: {unborn}")
-    return attach_provenance(df, HAZARD_FIELD_MAP)
+
+
+def load_wolf_rayet(path: Path) -> pd.DataFrame:
+    """Galactic Wolf-Rayet stars, kind star_wolf_rayet. Each is in its final
+    few hundred thousand years, so its collapse is drawn uniformly within
+    WR_MAX_REMAINING_MYR; its progenitor mass is a typical value."""
+    raw = pd.read_csv(path)
+    raw = raw[raw["Dist"].notna() & (raw["Dist"] > 0)]
+    wr_id = raw["WR"].str.strip()
+    other = raw["Name"].fillna("").str.strip()
+    df = pd.DataFrame({
+        "id": "wr:" + wr_id,
+        "name": np.where(other != "", wr_id + " (" + other + ")", wr_id),
+        "kind": "star_wolf_rayet",
+        "data_source": "Galactic Wolf-Rayet catalogue (Rate & Crowther 2020)",
+        "ra_icrs_deg": raw["RA_ICRS"],
+        "dec_icrs_deg": raw["DE_ICRS"],
+        "distance_pc": raw["Dist"] * 1000.0,   # catalog distances are in kpc
+        "spectral_type": raw["SpType"].str.strip(),
+        "luminosity_lsun": 10 ** raw["logL"],
+    })
+    df["mass_msun"] = WR_PROGENITOR_MASS_MSUN
+    df["main_sequence_lifetime_myr"] = ms_lifetime_myr(WR_PROGENITOR_MASS_MSUN)
+    df["t_collapse_myr"] = draw_clocks(df["id"], remaining_myr_max=WR_MAX_REMAINING_MYR)
+    df["t_birth_myr"] = df["t_collapse_myr"] - df["main_sequence_lifetime_myr"]
+    _check_born(df)
+    df = _add_positions(df)
+    return attach_provenance(df, WR_FIELD_MAP)
+
+
+def load_ob_stars(path: Path) -> pd.DataFrame:
+    """O and B stars from ALS III whose estimated mass is at least
+    CORE_COLLAPSE_MIN_MASS_MSUN, kind star_massive_progenitor. Stars with no
+    usable spectral type, and the catalog's Wolf-Rayet entries (taken from
+    the dedicated WR catalogue instead), are left out. Ages are unknown, so a
+    uniform fraction of each star's lifetime is drawn as remaining."""
+    raw = pd.read_csv(path)
+    raw = raw[raw["DistP50"].notna() & (raw["DistP50"] > 0)].copy()
+    raw["mass"] = raw["SpType"].map(estimate_ob_mass)
+    raw = raw[raw["mass"] >= CORE_COLLAPSE_MIN_MASS_MSUN]
+    gosc = raw["GOSC"].fillna("").str.strip()
+    als = "ALS " + raw["ALS"].astype(str)
+    df = pd.DataFrame({
+        "id": "als:" + raw["ALS"].astype(str),
+        "name": np.where(gosc != "", gosc + " (" + als + ")", als),
+        "kind": "star_massive_progenitor",
+        "data_source": "ALS III massive stars (Pantaleoni González et al. 2021)",
+        "ra_icrs_deg": raw["RAJ2000"],
+        "dec_icrs_deg": raw["DEJ2000"],
+        "distance_pc": raw["DistP50"],
+        "spectral_type": raw["SpType"].str.split(",").str[0].str.strip(),
+        "mass_msun": raw["mass"],
+    })
+    df["main_sequence_lifetime_myr"] = df["mass_msun"].map(ms_lifetime_myr)
+    df["t_collapse_myr"] = draw_clocks(df["id"], lifetimes=df["main_sequence_lifetime_myr"])
+    df["t_birth_myr"] = df["t_collapse_myr"] - df["main_sequence_lifetime_myr"]
+    _check_born(df)
+    df = _add_positions(df)
+    return attach_provenance(df, OB_FIELD_MAP)
 
 
 def _planet_kind(radius_rearth: float, mass_mearth: float) -> str:
@@ -296,13 +461,24 @@ def load_exoplanets(path: Path) -> pd.DataFrame:
 
 
 def load_entities(paths: dict[str, Path]) -> pd.DataFrame:
-    """paths: {"hyg": ..., "exoplanets": ..., "hazards": ...} -> unified entity table."""
+    """paths: {"hyg", "exoplanets", "hazards"} and optionally {"wolf_rayet",
+    "ob_stars"} -> unified entity table."""
     stars = load_hyg(paths["hyg"])
     hazards = load_hazards(paths["hazards"], stars)
     stars = stars[~stars["id"].isin(hazards["id"])]
-    exoplanets = load_exoplanets(paths["exoplanets"])
 
-    entities = pd.concat([stars, hazards, exoplanets], ignore_index=True)
+    catalog_hazards = []
+    kept = hazards
+    for key, loader in (("wolf_rayet", load_wolf_rayet), ("ob_stars", load_ob_stars)):
+        if key in paths:
+            rows = drop_sky_duplicates(loader(paths[key]), kept)
+            catalog_hazards.append(rows)
+            kept = pd.concat([kept, rows], ignore_index=True)
+    if catalog_hazards:
+        stars = drop_sky_duplicates(stars, pd.concat(catalog_hazards, ignore_index=True))
+
+    exoplanets = load_exoplanets(paths["exoplanets"])
+    entities = pd.concat([stars, hazards, *catalog_hazards, exoplanets], ignore_index=True)
     for column in ENTITY_COLUMNS:
         if column not in entities:
             entities[column] = None if column.endswith("__tier") else np.nan
