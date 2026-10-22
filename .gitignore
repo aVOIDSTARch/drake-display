@@ -50,3 +50,5 @@ htmlcov/
 
 # Generated renders
 output/
+data/raw/
+data/processed/

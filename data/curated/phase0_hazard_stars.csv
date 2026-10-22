@@ -1,0 +1,28 @@
+# Phase 0 hazard list: massive (>= ~10 Msun) core-collapse progenitors near the Sun.
+# Positions and distances come from HYG via the Hipparcos number; this file adds
+# only what HYG lacks. ALL values here are hand-entered and SPECULATIVE:
+#   mass_msun       approximate literature masses, rounded; verify against
+#                   SIMBAD/VizieR before relying on them (confidence 0.3)
+#   t_collapse_myr  a SCENARIO ASSIGNMENT for the time-slider demo, in Myr from
+#                   now -- evolved supergiants near-term, main-sequence stars
+#                   later. Not a prediction. (confidence 0.1)
+# Excluded: eta Car (no usable HYG match), mu Cep (HYG distance unknown).
+hip,name,mass_msun,t_collapse_myr,evolutionary_note
+27989,Betelgeuse,18,0.1,red supergiant
+80763,Antares,13,0.1,red supergiant
+34444,Wezen,17,0.5,yellow supergiant
+39953,gamma2 Velorum,28,0.5,Wolf-Rayet + O binary (O-star mass)
+24436,Rigel,21,1.0,blue supergiant
+35904,Aludra,19,1.0,blue supergiant
+26311,Alnilam,40,0.5,blue supergiant
+102098,Deneb,19,1.5,white supergiant
+27366,Saiph,15.5,1.5,blue supergiant
+39429,Naos,25,1.5,O supergiant
+26727,Alnitak,33,1.0,O supergiant
+25930,Mintaka,24,2.5,O bright giant
+81377,zeta Ophiuchi,20,3.0,O main sequence (runaway)
+60718,Acrux,17.8,4.0,B subgiant
+68702,Hadar,12,5.0,B giant
+62434,Mimosa,16,6.0,B giant
+33579,Adhara,12.6,8.0,B bright giant
+65474,Spica,11.4,10.0,B main sequence

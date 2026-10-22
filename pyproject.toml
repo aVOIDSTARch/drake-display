@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "fields"
 version = "0.1.0"
-description = "Composable scalar field library for weighted spatial influence."
+description = "Composable scalar field library and the Phase 0 habitability-veil pipeline."
 requires-python = ">=3.11"
 dependencies = [
     "numpy>=2.5.1",
@@ -14,9 +14,10 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["pytest>=8.0"]
 render = ["matplotlib>=3.9"]
+phase0 = ["pandas>=2.2", "astropy>=6.1", "plotly>=5.24", "matplotlib>=3.9"]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/fields"]
+packages = ["src/fields", "src/veil"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
