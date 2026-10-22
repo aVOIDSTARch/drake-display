@@ -45,7 +45,7 @@ Real data, real physics, real uncertainty:
 
 ## Project structure
 
-The repository is organized as layers that build on one another. **New here? Start with [NAVIGATION.md](NAVIGATION.md)** — a guided tour of every folder and suggested reading paths.
+The repository is organized as layers that build on one another. **New here? Start with [NAVIGATION.md](NAVIGATION.md)** — a guided tour of every folder and suggested reading paths. Every document is catalogued, with its status and purpose, in [`docs/documents.toml`](docs/documents.toml).
 
 | Folder | What's in it |
 | --- | --- |
@@ -53,6 +53,7 @@ The repository is organized as layers that build on one another. **New here? Sta
 | [`docs/model/`](docs/model/) | **Model definition** — the veil spec, entity schema, equations with certainty ratings, and factor definitions |
 | [`docs/data-sources/`](docs/data-sources/), [`docs/schemas/`](docs/schemas/) | **Data** — where the data comes from, and how every field and its confidence is described |
 | [`docs/engineering/`](docs/engineering/) | **Build plans** — the Phase 0 spec and the end-to-end pipeline design |
+| [`docs/code/`](docs/code/) | **Code documentation** — architecture, API references, configs, CLI, testing, extending |
 | [`docs/project/`](docs/project/) | **Project management** — charter, roadmap, decision log, changelog, governance, to-do list |
 | [`src/`](src/), [`tests/`](tests/), [`configs/`](configs/), [`data/`](data/), [`scripts/`](scripts/) | **The engine** — code, tests, model configs, curated data, and helper scripts |
 

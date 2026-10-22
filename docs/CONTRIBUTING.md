@@ -46,7 +46,8 @@ Factors are the heart of the model. To propose or change one:
 
 - **Discussions** — for open questions, science debates, factor proposals, and worldbuilding.
 - **Issues** — for concrete, actionable tasks and bugs.
-- **Pull requests** — reference the issue/discussion they address; explain the *why*, not just the *what*; update the relevant model-definition or research document alongside code.
+- **Pull requests** — reference the issue/discussion they address; explain the *why*, not just the *what*; update the relevant model-definition or research document alongside code, and the matching guide in `docs/code/`.
+- **New or moved documents** — add or update their entry in `docs/documents.toml` (format: `schema-document-descriptor.md`). The test suite checks it.
 
 ## Credit
 

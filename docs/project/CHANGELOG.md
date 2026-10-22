@@ -16,6 +16,13 @@ All notable changes to this project are recorded here. Format loosely follows *K
 - **Credit (ADR-017):** `AUTHORS.md` (by track, opt-in), `CITATION.cff`, and a Credit section in `CONTRIBUTING.md`.
 - **Versioning and slug (ADR-015, ADR-016):** semantic versioning with `v0.1.0` = Phase 0 passing its acceptance tests; slug `drake-display`.
 
+- **Code documentation (`docs/code/`):** architecture overview, API references for `fields` and `veil` (including every entity-table column), config reference, command-line reference, testing guide, and extension recipes.
+- **Document descriptor (ADR-018):** `schema-document-descriptor.md` defines how every document is described; `docs/documents.toml` describes all of them; `tests/test_document_manifest.py` keeps the manifest in step with the repository.
+
+### Changed
+
+- **Repository layout:** documentation moved into `docs/`, grouped by purpose; the root now holds six folders. `NAVIGATION.md` explains the layout. Superseded documents, including the early pseudocode, live in `docs/archive/`.
+
 ### Fixed
 
 - Config validation overwrote every factor's `distance.angle_rad` with 0.0.

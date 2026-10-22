@@ -42,9 +42,12 @@ Each subfolder answers one question.
 | [`docs/data-sources/`](docs/data-sources/) | Where does the data come from, and how far can it be trusted? | [`data-sources-catalog.md`](docs/data-sources/data-sources-catalog.md) |
 | [`docs/schemas/`](docs/schemas/) | How is each piece of data described? | [`SCHEMAS.md`](docs/schemas/SCHEMAS.md) |
 | [`docs/engineering/`](docs/engineering/) | How is the engine built? | [`plan-phase0-veil-prototype.md`](docs/engineering/plan-phase0-veil-prototype.md) |
+| [`docs/code/`](docs/code/) | How does the code work? | [`code-architecture.md`](docs/code/code-architecture.md) |
 | [`docs/community/`](docs/community/) | How do people take part? | [`discussions-intro-v0.2.md`](docs/community/discussions-intro-v0.2.md) |
 | [`docs/images/`](docs/images/) | Pictures used by other documents | — |
 | [`docs/archive/`](docs/archive/) | What was superseded? | — |
+
+**Every document is described in one manifest, [`docs/documents.toml`](docs/documents.toml).** Each entry gives its type, its status (draft, proposed, active, or superseded), whether other work must conform to it, its audience, a one-line summary, and what to read first. The format is defined in [`schema-document-descriptor.md`](docs/schemas/schema-document-descriptor.md). Search the manifest when you want, say, every active model document, or everything that depends on `entity.md`.
 
 Three standard files sit directly in `docs/`, where GitHub also finds them: [`CONTRIBUTING.md`](docs/CONTRIBUTING.md) (how to help, and the honesty standards), [`CODE_OF_CONDUCT.md`](docs/CODE_OF_CONDUCT.md) and [`SECURITY.md`](docs/SECURITY.md).
 
@@ -95,7 +98,6 @@ This is the formal contract the engine implements. Read it in this order:
 | [`pipeline-idea-v2.md`](docs/engineering/pipeline-idea-v2.md) | The end-to-end pipeline design, from raw catalogs to the rendered veil, across all phases |
 | [`pipeline-v1-assessment.md`](docs/engineering/pipeline-v1-assessment.md) | Why the first pipeline draft (now in `archive/`) was replaced |
 | [`setup-python-project.md`](docs/engineering/setup-python-project.md) | Notes on setting up the Python project |
-| [`pseudocode/`](docs/engineering/pseudocode/) | Early pseudocode for two core classes |
 
 ---
 
@@ -111,7 +113,17 @@ This is the formal contract the engine implements. Read it in this order:
 | [`data/curated/`](data/curated/) | Small hand-made input data, such as the list of nearby massive stars |
 | [`scripts/`](scripts/) | `calibrate_phase0.py` reproduces the calibrated settings; `phase0_static.py` renders the two-star demo |
 
-How to install and run it is in the README, under [Running Phase 0](README.md#running-phase-0).
+How to install and run it is in the README, under [Running Phase 0](README.md#running-phase-0). The code itself is documented in [`docs/code/`](docs/code/):
+
+| Guide | Covers |
+| --- | --- |
+| [`code-architecture.md`](docs/code/code-architecture.md) | **Start here.** Data flow, module map, conventions |
+| [`code-fields-reference.md`](docs/code/code-fields-reference.md) | Every class and function in `fields` |
+| [`code-veil-reference.md`](docs/code/code-veil-reference.md) | Every function in `veil`, and every entity-table column |
+| [`code-config-reference.md`](docs/code/code-config-reference.md) | Every config key and its validation rule |
+| [`code-cli-reference.md`](docs/code/code-cli-reference.md) | Installing, running, options, outputs, scripts |
+| [`code-testing.md`](docs/code/code-testing.md) | What each test file guarantees, and how to add tests |
+| [`code-extending.md`](docs/code/code-extending.md) | Recipes: a new kernel, factor, entity field, or data source |
 
 ### Files you won't find in git
 
@@ -133,7 +145,7 @@ All three can be deleted at any time; the next run recreates them.
 
 **Proposing or changing a factor.** Read [`factors.md`](docs/model/factors.md), then "Proposing a factor or coefficient" in [`CONTRIBUTING.md`](docs/CONTRIBUTING.md). Then read ADR-013 in [`DECISIONS.md`](docs/project/DECISIONS.md) to see how strengths are calibrated, and [`configs/phase0-galactic.toml`](configs/phase0-galactic.toml) to see where they live.
 
-**A developer working on the engine.** Read [`plan-phase0-veil-prototype.md`](docs/engineering/plan-phase0-veil-prototype.md), then [`src/veil/main.py`](src/veil/main.py), which wires the whole pipeline in about 120 lines. Then run `pytest`.
+**A developer working on the engine.** Read [`code-architecture.md`](docs/code/code-architecture.md), then [`plan-phase0-veil-prototype.md`](docs/engineering/plan-phase0-veil-prototype.md), then [`src/veil/main.py`](src/veil/main.py), which wires the whole pipeline in about 120 lines. Then run `pytest`.
 
 **Here for the worldbuilding.** Read the "Why it exists" section of the [README](README.md), then [`research-galactic-hazards-distribution.md`](docs/research/research-galactic-hazards-distribution.md) and [`research-galactic-chemical-evolution.md`](docs/research/research-galactic-chemical-evolution.md). These explain why some parts of the galaxy favor life and others don't.
 
@@ -151,10 +163,13 @@ All three can be deleted at any time; the next run recreates them.
 | A new data source | `docs/data-sources/` | Use the format in [`data-source-info-schema.md`](docs/schemas/data-source-info-schema.md); name it `source-<name>.md` |
 | A structural decision | an entry in `docs/project/DECISIONS.md` | Use the next ADR number |
 | A design or build plan | `docs/engineering/` | |
-| A document that has been replaced | `docs/archive/` | Keep it; don't delete it |
+| Documentation of the code | `docs/code/` | Name it `code-<topic>.md` |
+| A document that has been replaced | `docs/archive/` | Keep it; don't delete it. Set its status to `superseded` in the manifest |
 | An image | `docs/images/<topic>/` | |
 | Code | `src/fields/` if it's general, `src/veil/` if it's specific to the galaxy model | Add tests in `tests/` |
 | Model settings | `configs/` | |
 | Small hand-made data | `data/curated/` | Note where every value came from, and how much to trust it |
+
+**Registering documents.** Every new, moved, or renamed document needs an entry in [`docs/documents.toml`](docs/documents.toml). The test suite fails until it has one.
 
 **Naming.** Project-level files use capitals (`ROADMAP.md`, `DECISIONS.md`). Content documents use lowercase with hyphens (`research-fermi-paradox.md`). When one document mentions another, it usually gives the bare filename in `code` style, and every filename in `docs/` is unique, so searching for the name finds the file.

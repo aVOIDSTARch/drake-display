@@ -24,6 +24,7 @@
 | **Entity-effect wiring** | `entity-effects-matrix.md` format | the matrix | Emitter/Sampler/Receiver/Field-source; matched pair with `factors.md` |
 | **Decision record (ADR)** | `DECISIONS.md` entry format | the decision log | Decision / Rationale / Rules out |
 | **Changelog entry** | Keep-a-Changelog style | `CHANGELOG.md` | Added / Changed / Pending |
+| **Document descriptor** | `schema-document-descriptor.md` | one entry per document in `documents.toml` | Type, status, normative, audience, summary, dependencies; enforced by `tests/test_document_manifest.py` (ADR-018) |
 
 ## 3. Shared vocabulary (defined once, referenced everywhere)
 
@@ -38,6 +39,7 @@ To keep the project consistent, these definitions live in exactly one place and 
 | Confidence propagation (`EQ-CORE-4`) | `equations-provisional.md` |
 | Constants & parameters (values, uncertainties) | `factors.md` Appendix A |
 | Roles (Emitter/Sampler/Receiver/Field-source) | `entity-effects-matrix.md` §1 |
+| Document types, statuses & audiences | `schema-document-descriptor.md` §3–§5 |
 
 ## 4. Adding a new repeatable type
 

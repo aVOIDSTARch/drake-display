@@ -1,0 +1,613 @@
+# Document manifest -- The Drake Display
+#
+# One [[document]] entry per document in the repository, following
+# docs/schemas/schema-document-descriptor.md. tests/test_document_manifest.py
+# checks this file against the repository: add, move, rename, or retire a
+# document, and update its entry in the same change.
+#
+# Entries are grouped by folder.
+
+[[document]]
+path = "README.md"
+title = "The Drake Display"
+type = "overview"
+status = "active"
+normative = false
+audience = ["everyone"]
+summary = "What The Drake Display is, why it exists, and how to install and run the Phase 0 engine."
+
+[[document]]
+path = "NAVIGATION.md"
+title = "Navigating The Drake Display"
+type = "overview"
+status = "active"
+normative = false
+audience = ["everyone"]
+summary = "A guided tour of the repository layout, with reading paths by role and rules for where new files go."
+depends_on = ["README.md"]
+
+[[document]]
+path = "LICENSE"
+title = "License — Source Code (MIT)"
+type = "license"
+status = "active"
+normative = true
+audience = ["everyone"]
+summary = "MIT license for the project's source code."
+
+[[document]]
+path = "LICENSE-CONTENT"
+title = "License — Documentation & Research Content (CC BY 4.0)"
+type = "license"
+status = "active"
+normative = true
+audience = ["everyone"]
+summary = "CC BY 4.0 license for the documentation and research content, with the required attribution."
+depends_on = ["docs/project/AUTHORS.md"]
+
+[[document]]
+path = "docs/CONTRIBUTING.md"
+title = "Contributing to The Drake Display"
+type = "policy"
+status = "active"
+normative = true
+audience = ["contributors"]
+summary = "How to contribute to each track, the honesty standards every contribution must meet, and how contributors are credited."
+depends_on = ["docs/schemas/schema-field-definition.md"]
+
+[[document]]
+path = "docs/CODE_OF_CONDUCT.md"
+title = "Code of Conduct — The Drake Display"
+type = "policy"
+status = "active"
+normative = true
+audience = ["contributors"]
+summary = "Expected conduct in project spaces, centered on intellectual honesty and good-faith disagreement, and how to report problems."
+
+[[document]]
+path = "docs/SECURITY.md"
+title = "Security Policy — The Drake Display"
+type = "policy"
+status = "active"
+normative = true
+audience = ["contributors", "maintainers"]
+summary = "The project's security scope and how to report a vulnerability privately."
+
+[[document]]
+path = "docs/project/GOVERNANCE.md"
+title = "Governance — The Drake Display"
+type = "policy"
+status = "active"
+normative = true
+audience = ["contributors", "maintainers"]
+summary = "Who decides what, how model changes are reviewed, and how scientific disputes are settled through backing weights."
+depends_on = ["docs/project/CHARTER.md"]
+
+[[document]]
+path = "docs/project/CHARTER.md"
+title = "Project Charter — The Drake Display"
+type = "project-record"
+status = "active"
+normative = true
+audience = ["everyone"]
+summary = "The project's vision, mission, scope, non-goals, success criteria, and guiding principles."
+
+[[document]]
+path = "docs/project/ROADMAP.md"
+title = "Roadmap: The Galactic Habitability Veil — Full Project Phasing (High-Level)"
+type = "project-record"
+status = "active"
+normative = false
+audience = ["everyone"]
+summary = "The high-level phase plan, from Phase 0 (prove the model) to Phase 4 (polish and share)."
+depends_on = ["docs/project/CHARTER.md"]
+
+[[document]]
+path = "docs/project/DECISIONS.md"
+title = "Decision Log — The Drake Display"
+type = "project-record"
+status = "active"
+normative = true
+audience = ["contributors", "maintainers"]
+summary = "The append-only decision log: each ADR records a structural decision, its rationale, and what it rules out."
+
+[[document]]
+path = "docs/project/TODO.md"
+title = "TODO — The Drake Display"
+type = "project-record"
+status = "active"
+normative = false
+audience = ["contributors", "maintainers"]
+summary = "Open decisions, unfinished documents, science gaps, and deliberately deferred work."
+depends_on = ["docs/project/DECISIONS.md"]
+
+[[document]]
+path = "docs/project/CHANGELOG.md"
+title = "Changelog — The Drake Display"
+type = "project-record"
+status = "active"
+normative = false
+audience = ["everyone"]
+summary = "Notable changes to the project, release by release."
+
+[[document]]
+path = "docs/project/AUTHORS.md"
+title = "Authors & Contributors — The Drake Display"
+type = "project-record"
+status = "active"
+normative = false
+audience = ["everyone"]
+summary = "Contributors grouped by track, AI assistance, and the third-party data sources the project credits."
+depends_on = ["docs/CONTRIBUTING.md"]
+
+[[document]]
+path = "docs/project/GLOSSARY.md"
+title = "Glossary — The Drake Display"
+type = "project-record"
+status = "active"
+normative = false
+audience = ["everyone"]
+summary = "Definitions of the scientific terms, proper names, and code libraries used across the project."
+
+[[document]]
+path = "docs/project/WHODIS.md"
+title = "WHODIS.md"
+type = "project-record"
+status = "active"
+normative = false
+audience = ["everyone"]
+summary = "Identity and contact details for the project's maintainer."
+governed_by = "docs/schemas/whodis-bespoke-template.md"
+
+[[document]]
+path = "docs/model/spec-galactic-habitability-veil.md"
+title = "Spec: The Galactic Habitability \"Veil\" — Factor Model, Data Inventory & Feasibility Assessment"
+type = "model"
+status = "active"
+normative = true
+audience = ["scientists", "contributors", "developers"]
+summary = "The conceptual model of the habitability veil: the factor model, its mathematics, the available data, and a feasibility path."
+
+[[document]]
+path = "docs/model/entity.md"
+title = "Entity Schema — Complete Field Definition for the Galactic Habitability Veil"
+type = "model"
+status = "active"
+normative = true
+audience = ["contributors", "developers"]
+summary = "Every entity kind and every field it can carry: the contract between the data pipeline and the renderer."
+depends_on = ["docs/schemas/schema-field-definition.md"]
+
+[[document]]
+path = "docs/model/equations.md"
+title = "Equations — Index (Split by Certainty Tier)"
+type = "model"
+status = "active"
+normative = true
+audience = ["scientists", "contributors"]
+summary = "Index of every equation the model uses, split by certainty into a core set and a provisional set."
+depends_on = ["docs/model/equations-core.md", "docs/model/equations-provisional.md"]
+
+[[document]]
+path = "docs/model/equations-core.md"
+title = "Equations — Load-Bearing Set (Fundamental & Established)"
+type = "model"
+status = "active"
+normative = true
+audience = ["scientists", "contributors"]
+summary = "The load-bearing equations, rated Fundamental or Established, whose results may be treated as high-confidence."
+
+[[document]]
+path = "docs/model/equations-provisional.md"
+title = "Equations — Provisional Set (Approximate / Construct / Partial / Missing)"
+type = "model"
+status = "active"
+normative = true
+audience = ["scientists", "contributors"]
+summary = "The lower-confidence equations (Approximate, Construct, Partial, or Missing), including the confidence-propagation method EQ-CORE-4."
+
+[[document]]
+path = "docs/model/factors.md"
+title = "Factors — Specification for The Drake Display"
+type = "model"
+status = "active"
+normative = true
+audience = ["scientists", "contributors", "developers"]
+summary = "The factor registry: every factor's sign, regime, equations, spatial and temporal profiles, magnitude, and backing weight, plus the constants table."
+depends_on = ["docs/model/spec-galactic-habitability-veil.md", "docs/model/entity.md", "docs/model/equations.md"]
+
+[[document]]
+path = "docs/model/factors-v2.md"
+title = "Factors v2 — Specification for The Drake Display"
+type = "model"
+status = "proposed"
+normative = false
+audience = ["scientists", "contributors"]
+summary = "Proposed replacement for factors.md that splits the single log-odds sum into three terms combined in log space."
+depends_on = ["docs/model/factors.md", "docs/model/entity-effects-matrix.md", "docs/model/entity.md", "docs/model/equations-core.md", "docs/model/equations-provisional.md", "docs/model/spec-galactic-habitability-veil.md"]
+version = "v2"
+
+[[document]]
+path = "docs/model/entity-effects-matrix.md"
+title = "Entity-Effects Matrix — The Drake Display"
+type = "model"
+status = "active"
+normative = true
+audience = ["contributors", "developers"]
+summary = "The entity-first view of the model: which effects each entity kind emits, samples, or receives."
+depends_on = ["docs/model/factors.md", "docs/model/entity.md"]
+
+[[document]]
+path = "docs/data-sources/data-sources-catalog.md"
+title = "Data Sources Catalog — Public Astronomical Data for the Habitability Veil Project"
+type = "data-source"
+status = "active"
+normative = false
+audience = ["scientists", "contributors", "developers"]
+summary = "A survey of public astronomical datasets relevant to the model, with access, size, and relevance for each."
+
+[[document]]
+path = "docs/data-sources/source-at-hyg.md"
+title = "Data Source: AT-HYG Database"
+type = "data-source"
+status = "active"
+normative = true
+audience = ["developers", "scientists"]
+summary = "The HYG / AT-HYG star catalog: metadata, per-field provenance and confidence, limitations, and ingestion rules."
+governed_by = "docs/schemas/data-source-info-schema.md"
+depends_on = ["docs/model/entity.md"]
+
+[[document]]
+path = "docs/data-sources/source-nasa-exoplanet-archive.md"
+title = "Data Source: NASA Exoplanet Archive"
+type = "data-source"
+status = "active"
+normative = true
+audience = ["developers", "scientists"]
+summary = "The NASA Exoplanet Archive Planetary Systems table: metadata, per-field provenance and confidence, limitations, and ingestion rules."
+governed_by = "docs/schemas/data-source-info-schema.md"
+depends_on = ["docs/model/entity.md"]
+
+[[document]]
+path = "docs/schemas/SCHEMAS.md"
+title = "SCHEMAS — Document & Data Standards Registry"
+type = "schema"
+status = "active"
+normative = true
+audience = ["contributors", "maintainers"]
+summary = "Registry of every repeatable document and data type, the schema that governs it, and the shared vocabulary's canonical homes."
+
+[[document]]
+path = "docs/schemas/schema-field-definition.md"
+title = "Schema: Field Definition — The Drake Display"
+type = "schema"
+status = "active"
+normative = true
+audience = ["contributors", "developers", "scientists"]
+summary = "How to describe any data field, and the single source of truth for provenance tiers, the confidence scale, and the confidence colors."
+depends_on = ["docs/schemas/SCHEMAS.md"]
+
+[[document]]
+path = "docs/schemas/schema-document-descriptor.md"
+title = "Schema: Document Descriptor — The Drake Display"
+type = "schema"
+status = "active"
+normative = true
+audience = ["contributors", "maintainers"]
+summary = "How to describe any document, and the rules for the documents.toml manifest that describes them all."
+depends_on = ["docs/schemas/SCHEMAS.md"]
+
+[[document]]
+path = "docs/schemas/data-source-info-schema.md"
+title = "Schema: Data-Source Description — The Drake Display"
+type = "schema"
+status = "active"
+normative = true
+audience = ["contributors", "developers"]
+summary = "The template for describing a data source, centered on a field map giving per-field confidence for that source."
+depends_on = ["docs/schemas/schema-field-definition.md"]
+
+[[document]]
+path = "docs/schemas/data-store-schema.md"
+title = "Schema: Data Store — The Drake Display"
+type = "schema"
+status = "active"
+normative = true
+audience = ["developers"]
+summary = "How the project's layered data stores are laid out, from per-source staging to entities to the computed field."
+depends_on = ["docs/schemas/schema-field-definition.md", "docs/schemas/data-source-info-schema.md", "docs/model/entity.md"]
+
+[[document]]
+path = "docs/schemas/whodis-bespoke-template.md"
+title = "WHODIS.md"
+type = "template"
+status = "active"
+normative = false
+audience = ["maintainers"]
+summary = "Blank template for a WHODIS identity file."
+
+[[document]]
+path = "docs/research/research-document-reqs.md"
+title = "Research Document Requirements (Project Skill)"
+type = "schema"
+status = "active"
+normative = true
+audience = ["contributors", "scientists"]
+summary = "The seven-section template and standards that every research document must follow."
+depends_on = ["docs/schemas/SCHEMAS.md"]
+
+[[document]]
+path = "docs/research/research-drake-equation.md"
+title = "Research: The Drake Equation"
+type = "research"
+status = "active"
+normative = false
+audience = ["scientists", "worldbuilders"]
+summary = "What the Drake equation claims, which terms rest on data and which are guesswork, and how exoplanet discoveries changed the answer."
+governed_by = "docs/research/research-document-reqs.md"
+
+[[document]]
+path = "docs/research/research-fermi-paradox.md"
+title = "Research: The Fermi Paradox and Proposed Solutions"
+type = "research"
+status = "active"
+normative = false
+audience = ["scientists", "worldbuilders"]
+summary = "What the Fermi paradox is, the main families of proposed resolutions, and where the research literature stands."
+governed_by = "docs/research/research-document-reqs.md"
+
+[[document]]
+path = "docs/research/research-kardashev-scale.md"
+title = "Research: The Kardashev Scale"
+type = "research"
+status = "active"
+normative = false
+audience = ["scientists", "worldbuilders"]
+summary = "What the Kardashev scale measures, the technologies proposed for each tier, and the state of searches for advanced civilizations."
+governed_by = "docs/research/research-document-reqs.md"
+
+[[document]]
+path = "docs/research/research-stellar-compendium.md"
+title = "Research: A Stellar Compendium — Types of Stars, Their Remnants, Temporal Populations, and Their Radiography"
+type = "research"
+status = "active"
+normative = false
+audience = ["scientists", "worldbuilders"]
+summary = "A reference atlas of star types and remnants, the types that exist only at certain cosmic epochs, and their spectral energy output."
+governed_by = "docs/research/research-document-reqs.md"
+
+[[document]]
+path = "docs/research/research-stellar-energy-and-life.md"
+title = "Research: Stellar Energy and Its Uses by Life — Bioenergetics and Technospheres Across Epoch, Star Type, and Star Age"
+type = "research"
+status = "active"
+normative = false
+audience = ["scientists", "worldbuilders"]
+summary = "What life and technology can do with starlight, and how that changes with cosmic epoch, star type, and star age."
+governed_by = "docs/research/research-document-reqs.md"
+
+[[document]]
+path = "docs/research/research-galactic-hazards-distribution.md"
+title = "Research: The Galactic Hazard Distribution — A Hazard-Aware Extension of the Drake Equation"
+type = "research"
+status = "active"
+normative = false
+audience = ["scientists", "worldbuilders"]
+summary = "The space-time density of sterilizing events such as supernovae and gamma-ray bursts, as a hazard-aware extension of the Drake equation."
+governed_by = "docs/research/research-document-reqs.md"
+depends_on = ["docs/research/research-stellar-energy-and-life.md"]
+
+[[document]]
+path = "docs/research/research-galactic-chemical-evolution.md"
+title = "Research: Galactic Chemical Evolution and the Timing of Habitability"
+type = "research"
+status = "active"
+normative = false
+audience = ["scientists", "worldbuilders"]
+summary = "How the galaxy built up the elements planets and life need, and what that means for where and when it became habitable."
+governed_by = "docs/research/research-document-reqs.md"
+depends_on = ["docs/research/research-stellar-energy-and-life.md", "docs/research/research-galactic-hazards-distribution.md"]
+
+[[document]]
+path = "docs/research/other-science/research-centripetal-centrifugal-forces.md"
+title = "Research: Centripetal vs. Centrifugal Forces at Megastructure Scale"
+type = "research"
+status = "active"
+normative = false
+audience = ["worldbuilders", "scientists"]
+summary = "Centripetal versus centrifugal force, and where spin gravity breaks down for very large rotating habitats."
+governed_by = "docs/research/research-document-reqs.md"
+
+[[document]]
+path = "docs/research/other-science/research-cosmology-mysteries.md"
+title = "Research: The Ten Biggest Mysteries in Cosmology"
+type = "research"
+status = "active"
+normative = false
+audience = ["worldbuilders", "scientists"]
+summary = "The ten deepest unsolved problems in cosmology and the leading ideas about each."
+governed_by = "docs/research/research-document-reqs.md"
+
+[[document]]
+path = "docs/research/other-science/research-dna-limits-bioinformation.md"
+title = "Research: DNA — Structure, Statistical & Combinatorial Limits, and Bio-Information Technology"
+type = "research"
+status = "active"
+normative = false
+audience = ["worldbuilders", "scientists"]
+summary = "DNA's structure, its length and combinatorial limits, and the technology built on biological information."
+governed_by = "docs/research/research-document-reqs.md"
+
+[[document]]
+path = "docs/engineering/plan-phase0-veil-prototype.md"
+title = "Plan: Phase 0 — Galactic Habitability Veil Prototype (Self-Contained Build Spec)"
+type = "engineering"
+status = "active"
+normative = true
+audience = ["developers"]
+summary = "The self-contained Phase 0 build spec: scope, stack, architecture, build steps, mathematics, and acceptance criteria."
+depends_on = ["docs/model/spec-galactic-habitability-veil.md", "docs/data-sources/data-sources-catalog.md"]
+
+[[document]]
+path = "docs/engineering/pipeline-idea-v2.md"
+title = "Pipeline v2 — An End-to-End Architecture for the Veil, Grounded in the Actual Model"
+type = "engineering"
+status = "active"
+normative = false
+audience = ["developers"]
+summary = "An end-to-end pipeline design, from raw catalogs to the rendered veil and its confidence channel, across all phases."
+depends_on = ["docs/project/DECISIONS.md", "docs/model/factors.md", "docs/model/entity.md", "docs/schemas/data-store-schema.md", "docs/engineering/plan-phase0-veil-prototype.md", "docs/project/ROADMAP.md"]
+supersedes = "docs/archive/pipeline-idea-v1.md"
+version = "v2"
+
+[[document]]
+path = "docs/engineering/pipeline-v1-assessment.md"
+title = "Assessment: `pipeline-idea-v1.md` vs. The Drake Display's actual architecture"
+type = "engineering"
+status = "active"
+normative = false
+audience = ["developers"]
+summary = "Why the first pipeline draft was rejected as an architecture: it solves a harder problem than the project has and contradicts ratified decisions."
+depends_on = ["docs/archive/pipeline-idea-v1.md", "docs/project/DECISIONS.md"]
+
+[[document]]
+path = "docs/engineering/setup-python-project.md"
+title = "Setting Up the `fields` Project — src layout + pyproject.toml"
+type = "engineering"
+status = "active"
+normative = false
+audience = ["developers"]
+summary = "A walkthrough of the project's Python packaging: the src layout and a declarative pyproject.toml."
+
+[[document]]
+path = "docs/code/code-architecture.md"
+title = "Code Architecture"
+type = "code-guide"
+status = "active"
+normative = false
+audience = ["developers"]
+summary = "How the engine is put together, from data flow and module map to the conventions every module follows; the entry point to the code guides."
+depends_on = ["docs/model/spec-galactic-habitability-veil.md"]
+
+[[document]]
+path = "docs/code/code-fields-reference.md"
+title = "`fields` Reference"
+type = "code-guide"
+status = "active"
+normative = false
+audience = ["developers"]
+summary = "API reference for the fields library: kernels, distance metrics, time profiles, factors, the log-odds field, grids, configs, and rendering."
+depends_on = ["docs/code/code-architecture.md"]
+
+[[document]]
+path = "docs/code/code-veil-reference.md"
+title = "`veil` Reference"
+type = "code-guide"
+status = "active"
+normative = false
+audience = ["developers"]
+summary = "API reference for the veil pipeline, including every column of the entity table and its provenance."
+depends_on = ["docs/code/code-architecture.md", "docs/code/code-fields-reference.md"]
+
+[[document]]
+path = "docs/code/code-config-reference.md"
+title = "Config Reference"
+type = "code-guide"
+status = "active"
+normative = false
+audience = ["developers", "contributors"]
+summary = "Every key of the TOML model configs, its validation rule, and the configs that ship with Phase 0."
+depends_on = ["docs/code/code-fields-reference.md"]
+
+[[document]]
+path = "docs/code/code-cli-reference.md"
+title = "Command-Line Reference"
+type = "code-guide"
+status = "active"
+normative = false
+audience = ["developers", "everyone"]
+summary = "How to install and run the engine, its command-line options and outputs, and the helper scripts."
+depends_on = ["docs/code/code-architecture.md"]
+
+[[document]]
+path = "docs/code/code-testing.md"
+title = "Testing Guide"
+type = "code-guide"
+status = "active"
+normative = false
+audience = ["developers"]
+summary = "How the test suite is organized, what each file guarantees, and how to add tests."
+depends_on = ["docs/code/code-architecture.md"]
+
+[[document]]
+path = "docs/code/code-extending.md"
+title = "Extending the Engine"
+type = "code-guide"
+status = "active"
+normative = false
+audience = ["developers"]
+summary = "Step-by-step recipes for adding kernels, metrics, time profiles, factors, entity fields, and data sources, and for recalibrating."
+depends_on = ["docs/code/code-fields-reference.md", "docs/code/code-veil-reference.md", "docs/code/code-config-reference.md", "docs/schemas/schema-document-descriptor.md"]
+
+[[document]]
+path = "docs/community/discussions-intro-v0.2.md"
+title = "Welcome to The Drake Display — Discussions"
+type = "community"
+status = "active"
+normative = false
+audience = ["everyone"]
+summary = "The welcome post for the project's GitHub Discussions."
+supersedes = "docs/archive/discussions-intro-v0.1.md"
+version = "v0.2"
+
+[[document]]
+path = "docs/archive/discussions-intro-v0.1.md"
+title = "Welcome to the Galactic Habitability Veil — Discussions"
+type = "community"
+status = "superseded"
+normative = false
+audience = ["everyone"]
+summary = "The first Discussions welcome post, written under the project's earlier working title."
+superseded_by = "docs/community/discussions-intro-v0.2.md"
+version = "v0.1"
+
+[[document]]
+path = "docs/archive/equations-retired.md"
+title = "Equations — Reference Set for the Galactic Habitability Veil"
+type = "model"
+status = "superseded"
+normative = false
+audience = ["scientists", "contributors"]
+summary = "The original single equations reference, since split by certainty into a core set and a provisional set."
+superseded_by = "docs/model/equations.md"
+
+[[document]]
+path = "docs/archive/pipeline-idea-v1.md"
+title = "Draft 1 - July 9"
+type = "engineering"
+status = "superseded"
+normative = false
+audience = ["developers"]
+summary = "First pipeline draft, built around GPU simulation of a time-evolving field, which the project does not need."
+superseded_by = "docs/engineering/pipeline-idea-v2.md"
+version = "v1"
+
+[[document]]
+path = "docs/archive/pseudocode/class_SourceField.txt"
+title = "Pseudocode: SourceField"
+type = "engineering"
+status = "superseded"
+normative = false
+audience = ["developers"]
+summary = "Early pseudocode for the SourceField class, now implemented."
+superseded_by = "src/fields/source_field.py"
+
+[[document]]
+path = "docs/archive/pseudocode/class_CompositeField.txt"
+title = "Pseudocode: CompositeField"
+type = "engineering"
+status = "superseded"
+normative = false
+audience = ["developers"]
+summary = "Early pseudocode for the CompositeField class, now implemented."
+superseded_by = "src/fields/composite_field.py"
