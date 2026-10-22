@@ -23,7 +23,7 @@ from fields.temporal import RampSpikeDecayProfile
 
 # FAC-SN, factors.md section 2 and Appendix A
 SN_SIGN = -1
-SN_MAGNITUDE = 1.0
+SN_MAGNITUDE = 3.7  # calibrated, DECISIONS.md ADR-013
 SN_BACKING = 0.9
 SN_KILL_RADIUS_KPC = 0.010
 SN_DECAY_MYR = 2.0

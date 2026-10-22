@@ -86,3 +86,17 @@ A running record of significant decisions and their rationale, in the spirit of 
 **Rationale:** Data arrives by source but is consumed by entity, and confidence is per-field/per-source (ADR-011). A single "by source" processed store would force consumers to join across sources at read time (rejected); a single "by entity" store without provenance would lose the per-source confidence. Layering keeps the canonical store entity-oriented (consumers unchanged) while retaining full source provenance upstream and downstream. The veil field is a scalar field over a grid, not entity data, so it is stored in its natural array shape — the dual-regime (ADR-004) reappearing at the storage layer.
 **Rules out:** A single flat store; storing the computed field inside entity rows; discarding non-surfaced source values; entity-oriented storage that drops per-field provenance.
 **Enacted by:** `data-store-schema.md`.
+
+## ADR-013 — Phase 0 calibration targets
+
+**Decision:** The Phase 0 baseline and factor magnitudes are fitted to explicit targets rather than left at the `factors.md` starting values. Targets, at z = 0:
+
+- H ≈ 0.20 at the galactic center, ≈ 0.75 at the solar radius (R = 8.2 kpc, the peak), ≈ 0.40 at R = 20 kpc.
+- H rises monotonically from the center to the solar radius.
+- A core-collapse supernova at collapse drives H to ≤ 0.10 inside its kill radius, against the solar background.
+
+Fit, with signs, backings and profiles unchanged and the `FAC-DENSITY : FAC-AGN` magnitude ratio held at the `factors.md` 0.7 : 0.8: baseline −0.51; `FAC-METAL` M = 1.83; `FAC-DENSITY` M = 1.75; `FAC-AGN` M = 2.0; `FAC-SN` M = 3.7. Resulting H across the disk (R = 0, 2, 4, 6, 8.2, 12, 20 kpc): 0.20, 0.39, 0.69, 0.73, 0.75, 0.67, 0.40.
+**Rationale:** The starting values gave a veil that barely moved (H 0.46–0.71 galaxy-wide; a supernova at collapse only reached 0.50), which made the instrument unable to show the contrasts the model exists to show. Explicit targets make the tuning reviewable and testable. The density : core ratio is fixed because an unconstrained four-target fit needed a *negative* core magnitude and produced a non-monotonic disk — fitting noise, not physics. The targets are judgments about legibility, not measurements: a different reasonable target set would be equally defensible, which is why they are written down.
+**Caveat:** The solar peak remains partly built in: the placeholder metallicity band (`EQ-CHEM-3`) peaks at solar metallicity, which falls at the solar radius by construction. Resolving `EQ-CHEM-3` will require recalibrating.
+**Rules out:** Untuned starting values in rendered output; magnitudes changed without updating the targets and tests.
+**Enacted by:** `configs/phase0-galactic.toml`, `src/veil/registry.py` (`SN_MAGNITUDE`), `scripts/calibrate_phase0.py`, `tests/test_calibration.py`.

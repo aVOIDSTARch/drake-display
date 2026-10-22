@@ -43,7 +43,7 @@ def test_solar_band_clearly_beats_inner_region(galactic_sample):
     grid, sample = galactic_sample
     solar_band = sample.height[np.abs(grid.R - R_SUN) < 0.5].mean()
     inner = sample.height[grid.R < 3.0].mean()
-    assert solar_band > inner + 0.05
+    assert solar_band > inner + 0.25  # calibrated: ~0.75 vs ~0.42 (ADR-013)
 
 
 def test_local_veil_is_a_valid_probability_at_all_times(galactic, hazards):
@@ -83,4 +83,4 @@ def test_pre_collapse_dip_deepens_then_spikes_and_decays(galactic, hazards):
     assert np.all(np.diff(before) <= 0), "dip should deepen monotonically toward collapse"
     assert np.all(np.diff(after) >= 0), "dip should recover monotonically after the supernova"
     assert height(t_collapse) == pytest.approx(min(before + after))
-    assert height(t_collapse) < before[0] - 0.1  # the dip is substantial, not cosmetic
+    assert height(t_collapse) < 0.15  # calibrated kill zone, not a cosmetic dip (ADR-013)

@@ -10,7 +10,7 @@ baseline = 0.0   # logits add when combined; the galactic file holds B0
 [[factor]]
 name = "FAC-SN demo star A (20 Msun)"
 sign = -1
-magnitude = 1.0
+magnitude = 3.7   # calibrated FAC-SN, ADR-013
 backing = 0.9
 center = [-8.23, 0.0, 0.0]
 kernel = { type = "truncated_inverse_square", kill_radius = 0.010 }   # r_k,SN = 10 pc
@@ -21,7 +21,7 @@ inputs = { position = 0.1, mass_msun = 0.1 }   # speculative placement
 [[factor]]
 name = "FAC-SN demo star B (15 Msun)"
 sign = -1
-magnitude = 1.0
+magnitude = 3.7   # calibrated FAC-SN, ADR-013
 backing = 0.9
 center = [-8.17, 0.0, 0.0]
 kernel = { type = "truncated_inverse_square", kill_radius = 0.010 }
