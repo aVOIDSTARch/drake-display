@@ -36,30 +36,51 @@ MARKER_STYLES = {
 }
 
 
-def _fmt(value, spec: str, unit: str = "", conf=None) -> str:
-    if value is None or (isinstance(value, float) and np.isnan(value)):
+def _is_missing(value) -> bool:
+    return value is None or (isinstance(value, float) and np.isnan(value))
+
+
+def _fmt(entity: pd.Series, field: str, spec: str, unit: str = "") -> str:
+    """A value with its provenance, e.g. '18.00 Msun [Speculative 0.30]'."""
+    value = entity[field]
+    if _is_missing(value):
         return "unknown"
     text = f"{value:{spec}}{unit}"
-    if conf is not None and not (isinstance(conf, float) and np.isnan(conf)):
-        text += f" (conf {conf:.2f})"
+    tier, conf = entity.get(f"{field}__tier"), entity.get(f"{field}__conf")
+    if not _is_missing(conf):
+        text += f" [{tier} {conf:.2f}]"
     return text
+
+
+def lowest_confidence(entity: pd.Series) -> tuple[str, float] | None:
+    """(field, confidence) of the least-trusted present value on this entity."""
+    confs = {name[:-len("__conf")]: value for name, value in entity.items()
+             if name.endswith("__conf") and not _is_missing(value)}
+    if not confs:
+        return None
+    field = min(confs, key=confs.get)
+    return field, confs[field]
 
 
 def hover_text(entity: pd.Series, here: pd.Series, t: float) -> str:
     lines = [
         f"<b>{entity['name'] if isinstance(entity['name'], str) else entity['id']}</b>",
-        f"{entity['kind']}{' — SPECULATIVE' if entity['is_speculative'] else ''}",
-        f"distance {_fmt(entity['distance_pc'], '.1f', ' pc')}",
-        f"R {entity['r_gal_kpc']:.2f} kpc, z {entity['z_gal_kpc'] * 1000:+.0f} pc",
-        f"mass {_fmt(entity['mass_msun'], '.2f', ' Msun', entity['conf_mass_msun'])}",
-        f"[Fe/H] {_fmt(entity['feh'], '+.2f', '', entity['conf_feh'])}",
+        entity["kind"],
+        f"distance {_fmt(entity, 'distance_pc', '.1f', ' pc')}",
+        f"R {_fmt(entity, 'r_gal_kpc', '.2f', ' kpc')}, z {entity['z_gal_kpc'] * 1000:+.0f} pc",
+        f"mass {_fmt(entity, 'mass_msun', '.2f', ' Msun')}",
+        f"[Fe/H] {_fmt(entity, 'feh', '+.2f')}",
     ]
     if entity["kind"] == "planetary_system":
         lines.append(f"planets {int(entity['num_planets'])}, in HZ {int(entity['num_planets_in_hz'])}")
     if entity["kind"] == "star_massive_progenitor":
         remaining = entity["t_collapse_myr"] - t
         status = f"collapse in {remaining:.2f} Myr" if remaining > 0 else f"collapsed {-remaining:.2f} Myr ago"
-        lines.append(f"{status} (scenario clock, conf {entity['conf_clock']:.2f})")
+        lines.append(f"{status} [scenario clock: {entity['t_collapse_myr__tier']} "
+                     f"{entity['t_collapse_myr__conf']:.2f}]")
+    weakest = lowest_confidence(entity)
+    if weakest is not None:
+        lines.append(f"least certain: {weakest[0]} ({weakest[1]:.2f})")
     lines.append(f"<b>H here {here['habitability_here']:.3f}</b>, confidence {here['confidence_here']:.2f}")
     lines.append(f"<i>{entity['data_source']}</i>")
     return "<br>".join(lines)

@@ -9,7 +9,8 @@
 - **Naming:** `snake_case`, with unit suffixes where meaningful (`_kpc`, `_pc`, `_msun`, `_myr`, `_k`, `_au`). Predictable names let the renderer bind fields generically.
 - **Units:** stated explicitly per field. Positions in kiloparsecs (galactocentric) and parsecs (heliocentric distance); masses in solar masses; temperatures in kelvin; times in megayears; planetary distances in astronomical units.
 - **Nullability:** only the **core** group is required for *every* entity. All other groups are conditionally populated by `kind` (a planet has no `spectral_type`; a black hole has no `habitable_zone`). Missing values are explicit NULL, never silently zero — zero and unknown must be distinguishable in the field math.
-- **Provenance philosophy:** every physically meaningful value should be traceable to a source and flagged as measured vs. modeled (`is_speculative`, `data_source`). This powers the observed-vs-speculative shading that keeps the veil honest.
+- **Provenance philosophy:** every physically meaningful value is traceable to a source and carries its own provenance — a `provenance_tier` and a `confidence` per `schema-field-definition.md` (ADR-011), plus the entity's `data_source`. Uncertainty is per-field, not per-record: a star's position can be Measured while its mass is Inferred and its metallicity Modeled, in one row. This powers the confidence shading that keeps the veil honest.
+- **Provenance columns:** in a flat entity table, each physical field `F` is stored with two companions, `F__tier` (one of the five tiers) and `F__conf` (in [0, 1]). They are populated exactly where `F` has a value. A value with no stated provenance is **Speculative / 0.10** — the fail-safe default; certainty must be stated, never assumed. Identity fields (`id`, `name`, `kind`, `data_source`, `parent_star_id`) carry no provenance.
 - **Growth rule:** the schema only ever *grows*. Fields are never removed, so older cached entities stay valid.
 
 ---
@@ -23,7 +24,7 @@
 | `catalog_name` | string | — | — | catalog | Formal designation, e.g. `Gaia DR3 4657...`, `HIP 27989`, `SNR Cas A` |
 | `aliases` | string[] | — | — | enrichment (SIMBAD) | Alternative designations for search/cross-ID |
 | `kind` | enum | — | ✓ | ingestion logic | See enum list below; drives rendering style, click behavior, and which field groups apply |
-| `is_speculative` | bool | — | ✓ | pipeline | `true` if position/properties are modeled (population synthesis, estimation); `false` if from real survey. Drives provenance shading |
+| `is_speculative` | bool | — | — | — | **Superseded (ADR-011); no longer populated.** Retained here only under the growth rule. A boolean cannot express "position measured, mass inferred, metallicity modeled" in one record — use the per-field `F__tier` / `F__conf` columns instead |
 
 **`kind` enumeration:** `star_main_sequence`, `star_giant`, `star_supergiant`, `star_wolf_rayet`, `star_massive_progenitor`, `brown_dwarf`, `white_dwarf`, `neutron_star`, `pulsar`, `magnetar`, `black_hole`, `planet_terrestrial`, `planet_super_earth`, `planet_mini_neptune`, `planet_gas_giant`, `exoplanet_candidate`, `planetary_system`, `open_cluster`, `globular_cluster`, `supernova_remnant`, `hazard_collapsar`, `hazard_grb_candidate`, `dark_star_candidate`, `region_marker`.
 
@@ -82,7 +83,7 @@
 
 | Field | Type | Units | Source | Notes |
 | --- | --- | --- | --- | --- |
-| `feh` | float | dex | spectroscopy (APOGEE/GALAH) or **modeled `feh(R)`** | [Fe/H] vs. solar; **primary input to the metallicity-ridge factor**; if measured absent, filled from the radial gradient (flag via `is_speculative`) |
+| `feh` | float | dex | spectroscopy (APOGEE/GALAH) or **modeled `feh(R)`** | [Fe/H] vs. solar; **primary input to the metallicity-ridge factor**; if measured absent, filled from the radial gradient (`feh__tier` = Modeled, `feh__conf` = 0.40) |
 | `feh_err` | float | dex | catalog | 1σ; distinguishes spectroscopic from grid-interpolated |
 | `alpha_fe` | float | dex | spectroscopy | [α/Fe]; high → rapid early star formation (thick-disk marker) |
 | `abundance_c` | float | dex | spectroscopy | [C/H] |
@@ -170,6 +171,16 @@
 
 ---
 
+## Source field maps
+
+Each source's per-field `(provenance_tier, confidence)` values are defined once, in its source description (format: `data-source-info-schema.md`), and copied verbatim into the ingestion code (`src/veil/ingest.py`):
+
+| Source | Description | Notes |
+| --- | --- | --- |
+| HYG / AT-HYG stars | `project-building-files/data/external-sources/source-at-hyg.md` | Positions Measured; mass, Teff, luminosity Inferred; `feh` Modeled (0.40) |
+| NASA Exoplanet Archive | `project-building-files/data/external-sources/source-nasa-exoplanet-archive.md` | Host `feh` Measured (0.85) where `st_met` exists, else Modeled (0.40) |
+| Phase 0 hazard list | `data/curated/phase0_hazard_stars.csv` | Position from HYG (Measured); `mass_msun` Speculative 0.30; `t_collapse_myr`, `t_birth_myr` Speculative 0.10 (scenario values) |
+
 ## Field-group applicability by `kind` (quick reference)
 
 - **Main-sequence / giant star:** groups 1, 2, 3, 4, 5, 6, 10, 11 (+ 7 if it hosts planets).
@@ -182,4 +193,4 @@
 
 ## Minimum viable subset for Phase 0
 
-To stand up the Phase 0 prototype, only these are strictly required per entity: `id`, `kind`, `is_speculative`, `x_gal_kpc`, `y_gal_kpc`, `z_gal_kpc`, `r_gal_kpc`, `distance_pc`, and — for stars — `mass_msun` and `feh` (the latter may be modeled from the radial gradient), plus `t_birth_myr` and `main_sequence_lifetime_myr` for any entity that acts as a time-evolving hazard. Everything else is enrichment layered on in later phases.
+To stand up the Phase 0 prototype, only these are strictly required per entity: `id`, `kind`, `x_gal_kpc`, `y_gal_kpc`, `z_gal_kpc`, `r_gal_kpc`, `distance_pc`, and — for stars — `mass_msun` and `feh` (the latter may be modeled from the radial gradient), plus `t_birth_myr` and `main_sequence_lifetime_myr` for any entity that acts as a time-evolving hazard. Every present physical value carries its `F__tier` / `F__conf` pair. Everything else is enrichment layered on in later phases.

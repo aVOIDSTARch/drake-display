@@ -13,7 +13,7 @@ center = [0.0, 0.0, 0.0]
 kernel = { type = "metallicity_band" }   # EQ-CHEM-1 + placeholder EQ-CHEM-3
 distance = { type = "cylindrical" }
 temporal = { type = "static" }           # G-ENRICH held constant until EQ-CHEM-4
-inputs = { r_gal_kpc = 0.9, feh = 0.5 }  # feh is inferred from the gradient, not measured
+inputs = { r_gal_kpc = 0.85, feh = 0.40 } # feh is Modeled from the gradient (source-at-hyg.md)
 
 [[factor]]
 name = "FAC-DENSITY"
@@ -24,7 +24,7 @@ center = [0.0, 0.0, 0.0]
 kernel = { type = "exponential", scale = 1.0 }
 distance = { type = "disk_scaled", h_R = 2.5, h_z = 0.3 }   # EQ-PROF-1
 temporal = { type = "static" }
-inputs = { r_gal_kpc = 0.9, z_gal_kpc = 0.9 }
+inputs = { r_gal_kpc = 0.85, z_gal_kpc = 0.85 }
 
 [[factor]]
 name = "FAC-AGN"
@@ -35,4 +35,4 @@ center = [0.0, 0.0, 0.0]
 kernel = { type = "logistic_step", radius = 2.5, width = 0.3 }   # P-INNER, R_inner = 2.5 kpc
 distance = { type = "cylindrical" }
 temporal = { type = "static" }
-inputs = { r_gal_kpc = 0.9 }
+inputs = { r_gal_kpc = 0.85 }

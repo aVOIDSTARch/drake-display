@@ -11,9 +11,11 @@ the field maps in project-building-files/data/external-sources/:
     load_entities     all of the above, one row per entity
 
 Column names follow entity.md. Values that are unknown stay NaN -- never
-zero. Each row also carries a confidence for the fields the field model
-reads (conf_position, conf_mass_msun, conf_feh, conf_clock), taken from
-the source field maps; that is the input side of EQ-CORE-4.
+zero. Every physical value F carries its provenance in two companion
+columns, F__tier and F__conf (ADR-011, schema-field-definition.md), taken
+from the per-source field maps below. A present value with no stated
+provenance is Speculative / 0.10 -- uncertainty is the default. These
+confidences are the input side of EQ-CORE-4.
 
 Entity resolution between sources is a no-op in Phase 0 (pipeline-idea-v2
 3.2): exoplanet hosts are kept as their own planetary_system entities.
@@ -25,6 +27,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from fields.factor import DEFAULT_FIELD_CONFIDENCE
 from fields.kernels import MetallicityBandKernel
 from fields.temporal import ms_lifetime_myr
 
@@ -36,34 +39,96 @@ MASS_LUMINOSITY_EXPONENT = 3.5    # L ~ M^3.5, main sequence only
 HZ_FLUX_INNER = 1.1               # S_inner, factors.md Appendix A
 HZ_FLUX_OUTER = 0.35              # S_outer
 
-# Confidences from the source field maps (source-at-hyg.md, source-nasa-exoplanet-archive.md)
-CONF = {
-    "hyg_position": 0.85,
-    "hyg_mass": 0.50,
-    "hyg_teff": 0.65,
-    "hyg_luminosity": 0.80,
-    "modeled_feh": 0.40,
-    "exo_position": 0.90,
-    "exo_mass": 0.70,
-    "exo_feh": 0.85,
-    "curated_mass": 0.30,   # hand-entered, see data/curated/phase0_hazard_stars.csv
-    "scenario_clock": 0.10,  # t_collapse is a scenario assignment, not a measurement
-}
+# Provenance tiers, schema-field-definition.md section 3
+MEASURED = "Measured"
+INFERRED = "Inferred"
+STATISTICAL = "Statistical-only"
+MODELED = "Modeled"
+SPECULATIVE = "Speculative"
 
-ENTITY_COLUMNS = [
-    "id", "name", "kind", "is_speculative", "data_source",
-    "ra_icrs_deg", "dec_icrs_deg", "distance_pc",
-    "x_gal_kpc", "y_gal_kpc", "z_gal_kpc", "r_gal_kpc", "z_height_kpc",
+IDENTITY_COLUMNS = ["id", "name", "kind", "data_source", "parent_star_id"]
+POSITION_FIELDS = ["x_gal_kpc", "y_gal_kpc", "z_gal_kpc", "r_gal_kpc", "z_height_kpc"]
+PHYSICAL_FIELDS = [
+    "ra_icrs_deg", "dec_icrs_deg", "distance_pc", *POSITION_FIELDS,
     "mag_apparent_v", "mag_absolute_v", "color_bv", "spectral_type",
     "luminosity_lsun", "teff_k", "mass_msun", "feh",
     "main_sequence_lifetime_myr", "t_birth_myr", "t_collapse_myr",
-    "num_planets", "num_planets_in_hz", "parent_star_id",
+    "num_planets", "num_planets_in_hz",
     "planet_radius_rearth", "insolation_earth_equiv", "in_habitable_zone",
-    "conf_position", "conf_mass_msun", "conf_feh", "conf_clock",
 ]
+ENTITY_COLUMNS = IDENTITY_COLUMNS + PHYSICAL_FIELDS + [
+    f"{f}__{suffix}" for f in PHYSICAL_FIELDS for suffix in ("tier", "conf")
+]
+
+
+def _with_position(provenance: tuple[str, float]) -> dict[str, tuple[str, float]]:
+    """Derived galactocentric coordinates inherit one shared provenance."""
+    return {f: provenance for f in POSITION_FIELDS}
+
+
+# Per-source field maps: field -> (provenance_tier, confidence), verbatim from
+# project-building-files/data/external-sources/source-*.md
+HYG_FIELD_MAP = {
+    "ra_icrs_deg": (MEASURED, 0.98),
+    "dec_icrs_deg": (MEASURED, 0.98),
+    "distance_pc": (MEASURED, 0.85),
+    **_with_position((MEASURED, 0.85)),
+    "mag_apparent_v": (MEASURED, 0.95),
+    "mag_absolute_v": (MEASURED, 0.85),
+    "color_bv": (MEASURED, 0.90),
+    "spectral_type": (MEASURED, 0.70),
+    "luminosity_lsun": (INFERRED, 0.80),
+    "teff_k": (INFERRED, 0.65),
+    "mass_msun": (INFERRED, 0.50),
+    "feh": (MODELED, 0.40),
+}
+
+# The curated hazard list overrides what it hand-assigns (data/curated/phase0_hazard_stars.csv)
+HAZARD_FIELD_MAP = {
+    **HYG_FIELD_MAP,
+    "mass_msun": (SPECULATIVE, 0.30),
+    "main_sequence_lifetime_myr": (SPECULATIVE, 0.30),  # EQ-STAR-1 on a speculative mass
+    "t_collapse_myr": (SPECULATIVE, 0.10),              # scenario assignment, not a prediction
+    "t_birth_myr": (SPECULATIVE, 0.10),
+}
+
+EXOPLANET_FIELD_MAP = {
+    "ra_icrs_deg": (MEASURED, 0.98),
+    "dec_icrs_deg": (MEASURED, 0.98),
+    "distance_pc": (MEASURED, 0.90),
+    **_with_position((MEASURED, 0.90)),
+    "teff_k": (MEASURED, 0.85),
+    "mass_msun": (INFERRED, 0.70),
+    "feh": (MEASURED, 0.85),              # spectroscopic st_met; modeled fallback set per row
+    "luminosity_lsun": (MEASURED, 0.80),
+    "num_planets": (MEASURED, 0.95),
+    "num_planets_in_hz": (INFERRED, 0.70),
+    "planet_radius_rearth": (MEASURED, 0.85),
+    "insolation_earth_equiv": (INFERRED, 0.75),
+    "in_habitable_zone": (INFERRED, 0.70),
+}
+MODELED_FEH = (MODELED, 0.40)
 
 _LUMINOSITY_CLASS = re.compile(r"\d(?:\.\d+)?\s*(Iab|Ia|Ib|III|II|IV|VI|V|I)(?![a-z]*[IV])")
 _GRADIENT = MetallicityBandKernel()  # holds EQ-CHEM-1 with the Appendix A constants
+
+
+def attach_provenance(df: pd.DataFrame, field_map: dict[str, tuple[str, float]],
+                      rows: pd.Series | None = None) -> pd.DataFrame:
+    """Write F__tier / F__conf for each mapped field where its value is
+    present (optionally only on the given boolean rows)."""
+    for field_name, (tier, conf) in field_map.items():
+        if field_name not in df:
+            continue
+        target = df[field_name].notna()
+        if rows is not None:
+            target &= rows
+        if f"{field_name}__tier" not in df:
+            df[f"{field_name}__tier"] = pd.Series(None, index=df.index, dtype=object)
+            df[f"{field_name}__conf"] = np.nan
+        df.loc[target, f"{field_name}__tier"] = tier
+        df.loc[target, f"{field_name}__conf"] = conf
+    return df
 
 
 def _add_positions(df: pd.DataFrame) -> pd.DataFrame:
@@ -122,7 +187,6 @@ def load_hyg(path: Path) -> pd.DataFrame:
         "spectral_type": raw["spect"],
     })
     df["kind"] = df["spectral_type"].map(classify_star)
-    df["is_speculative"] = False
     df["data_source"] = "HYG v4.1"
 
     df["luminosity_lsun"] = 10 ** (0.4 * (SOLAR_ABSMAG_V - df["mag_absolute_v"]))
@@ -135,11 +199,7 @@ def load_hyg(path: Path) -> pd.DataFrame:
 
     df = _add_positions(df)
     df["feh"] = modeled_feh(df["r_gal_kpc"])
-
-    df["conf_position"] = CONF["hyg_position"]
-    df["conf_mass_msun"] = np.where(df["mass_msun"].notna(), CONF["hyg_mass"], np.nan)
-    df["conf_feh"] = CONF["modeled_feh"]
-    return df
+    return attach_provenance(df, HYG_FIELD_MAP)
 
 
 def load_hazards(path: Path, stars: pd.DataFrame) -> pd.DataFrame:
@@ -148,7 +208,9 @@ def load_hazards(path: Path, stars: pd.DataFrame) -> pd.DataFrame:
     should be dropped so each star appears once."""
     curated = pd.read_csv(path, comment="#")
     candidates = stars[stars["hip"].isin(curated["hip"])]
-    joined = curated.merge(candidates.drop(columns=["name", "mass_msun", "conf_mass_msun"]),
+    hyg_columns = [c for c in candidates.columns
+                   if c not in ("name", "mass_msun") and not c.endswith(("__tier", "__conf"))]
+    joined = curated.merge(candidates[hyg_columns],
                            on="hip", how="left", validate="one_to_one")
     unmatched = joined.loc[joined["id"].isna(), "name"].tolist()
     if unmatched:
@@ -156,7 +218,6 @@ def load_hazards(path: Path, stars: pd.DataFrame) -> pd.DataFrame:
 
     df = joined.copy()
     df["kind"] = "star_massive_progenitor"
-    df["is_speculative"] = True  # mass and clock are hand-assigned
     df["data_source"] = "HYG v4.1 + curated Phase 0 hazard list"
     df["main_sequence_lifetime_myr"] = df["mass_msun"].map(ms_lifetime_myr)
     df["t_birth_myr"] = df["t_collapse_myr"] - df["main_sequence_lifetime_myr"]
@@ -164,9 +225,7 @@ def load_hazards(path: Path, stars: pd.DataFrame) -> pd.DataFrame:
     if unborn:
         raise ValueError(f"t_collapse_myr is later than the EQ-STAR-1 lifetime allows, so these "
                          f"stars would be born in the future: {unborn}")
-    df["conf_mass_msun"] = CONF["curated_mass"]
-    df["conf_clock"] = CONF["scenario_clock"]
-    return df
+    return attach_provenance(df, HAZARD_FIELD_MAP)
 
 
 def _planet_kind(radius_rearth: float, mass_mearth: float) -> str:
@@ -225,19 +284,15 @@ def load_exoplanets(path: Path) -> pd.DataFrame:
     })
 
     df = pd.concat([systems, planets], ignore_index=True)
-    df["is_speculative"] = False
     df["data_source"] = "NASA Exoplanet Archive (PS, default_flag=1)"
     df = _add_positions(df)
 
-    # Spectroscopic st_met surfaces over the modeled gradient where present
-    measured_feh = df["feh"].notna()
-    df.loc[~measured_feh & (df["kind"] == "planetary_system"), "feh"] = modeled_feh(
-        df.loc[~measured_feh & (df["kind"] == "planetary_system"), "r_gal_kpc"])
-    df["conf_feh"] = np.where(measured_feh, CONF["exo_feh"],
-                              np.where(df["feh"].notna(), CONF["modeled_feh"], np.nan))
-    df["conf_position"] = CONF["exo_position"]
-    df["conf_mass_msun"] = np.where(df["mass_msun"].notna(), CONF["exo_mass"], np.nan)
-    return df
+    # Spectroscopic st_met surfaces over the modeled gradient where present;
+    # hosts without it fall back to EQ-CHEM-1 and carry Modeled provenance
+    needs_model = df["feh"].isna() & (df["kind"] == "planetary_system")
+    df.loc[needs_model, "feh"] = modeled_feh(df.loc[needs_model, "r_gal_kpc"])
+    df = attach_provenance(df, EXOPLANET_FIELD_MAP)
+    return attach_provenance(df, {"feh": MODELED_FEH}, rows=needs_model)
 
 
 def load_entities(paths: dict[str, Path]) -> pd.DataFrame:
@@ -250,5 +305,15 @@ def load_entities(paths: dict[str, Path]) -> pd.DataFrame:
     entities = pd.concat([stars, hazards, exoplanets], ignore_index=True)
     for column in ENTITY_COLUMNS:
         if column not in entities:
-            entities[column] = np.nan
-    return entities[ENTITY_COLUMNS]
+            entities[column] = None if column.endswith("__tier") else np.nan
+    return enforce_provenance_default(entities[ENTITY_COLUMNS])
+
+
+def enforce_provenance_default(entities: pd.DataFrame) -> pd.DataFrame:
+    """ADR-011 fail-safe: any present physical value with no stated
+    provenance is Speculative at the default field confidence."""
+    for field_name in PHYSICAL_FIELDS:
+        unstated = entities[field_name].notna() & entities[f"{field_name}__conf"].isna()
+        entities.loc[unstated, f"{field_name}__tier"] = SPECULATIVE
+        entities.loc[unstated, f"{field_name}__conf"] = DEFAULT_FIELD_CONFIDENCE
+    return entities

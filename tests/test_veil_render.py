@@ -39,7 +39,8 @@ def test_hover_reports_clock_and_provenance(paths):  # noqa: F811
     betelgeuse = entities[entities["name"] == "Betelgeuse"].iloc[0]
     here = pd.Series({"habitability_here": 0.5, "confidence_here": 0.1})
     text = interactive.hover_text(betelgeuse, here, t=0.0)
-    assert "SPECULATIVE" in text
+    assert "[Speculative 0.30]" in text  # hand-entered mass
+    assert "least certain: t_birth_myr (0.10)" in text or "least certain: t_collapse_myr (0.10)" in text
     assert "collapse in 0.10 Myr" in text
     assert "collapsed" in interactive.hover_text(betelgeuse, here, t=1.0)
 

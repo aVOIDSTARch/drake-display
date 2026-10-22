@@ -41,9 +41,9 @@ def supernova_factor(entity: pd.Series) -> Factor:
         magnitude=SN_MAGNITUDE,
         temporal=RampSpikeDecayProfile(entity["t_birth_myr"], entity["t_collapse_myr"], SN_DECAY_MYR),
         input_confidences={
-            "position": entity["conf_position"],
-            "mass_msun": entity["conf_mass_msun"],
-            "t_collapse_myr": entity["conf_clock"],
+            "position": entity["x_gal_kpc__conf"],
+            "mass_msun": entity["mass_msun__conf"],
+            "t_collapse_myr": entity["t_collapse_myr__conf"],
         },
     )
 

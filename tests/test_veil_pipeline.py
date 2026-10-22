@@ -8,8 +8,12 @@ pytest.importorskip("astropy")
 
 from veil.coords import R0_KPC, to_galactocentric  # noqa: E402
 from veil.ingest import (  # noqa: E402
-    CONF,
+    MEASURED,
+    MODELED,
+    PHYSICAL_FIELDS,
+    SPECULATIVE,
     classify_star,
+    enforce_provenance_default,
     load_entities,
     load_exoplanets,
     load_hazards,
@@ -103,14 +107,16 @@ def test_hyg_estimates_mass_for_main_sequence_only(paths):
     assert np.isnan(stars.loc["hyg:1", "mass_msun"])  # supergiant
     assert np.isnan(stars.loc["hyg:5", "mass_msun"])  # giant
     assert stars.loc["hyg:6", "mass_msun"] > 0
-    assert stars.loc["hyg:6", "conf_mass_msun"] == CONF["hyg_mass"]
-    assert np.isnan(stars.loc["hyg:5", "conf_mass_msun"])
+    assert stars.loc["hyg:6", "mass_msun__conf"] == 0.50
+    assert stars.loc["hyg:6", "mass_msun__tier"] == "Inferred"
+    assert np.isnan(stars.loc["hyg:5", "mass_msun__conf"])  # no value -> no provenance
 
 
 def test_hyg_feh_is_modeled_from_radius(paths):
     stars = load_hyg(paths["hyg"])
     np.testing.assert_allclose(stars["feh"], modeled_feh(stars["r_gal_kpc"]))
-    assert (stars["conf_feh"] == CONF["modeled_feh"]).all()
+    assert (stars["feh__conf"] == 0.40).all()
+    assert (stars["feh__tier"] == MODELED).all()
 
 
 # ---- hazards ----
@@ -121,7 +127,9 @@ def test_hazards_take_position_from_hyg_and_derive_clock(paths):
     betelgeuse = stars.set_index("id").loc["hyg:1"]
     assert hazards.loc["Betelgeuse", "x_gal_kpc"] == betelgeuse["x_gal_kpc"]
     assert hazards.loc["Betelgeuse", "kind"] == "star_massive_progenitor"
-    assert hazards["is_speculative"].all()
+    assert (hazards["mass_msun__tier"] == SPECULATIVE).all()
+    assert (hazards["t_collapse_myr__conf"] == 0.10).all()
+    assert (hazards["x_gal_kpc__tier"] == MEASURED).all()  # position is still measured
     life = hazards.loc["Spica", "main_sequence_lifetime_myr"]
     assert hazards.loc["Spica", "t_birth_myr"] == pytest.approx(10.0 - life)
 
@@ -164,10 +172,12 @@ def test_habitable_zone_uses_insolation_or_derives_it(paths):
 def test_measured_metallicity_beats_modeled(paths):
     exo = load_exoplanets(paths["exoplanets"]).set_index("id")
     assert exo.loc["exo-sys:Host", "feh"] == 0.10
-    assert exo.loc["exo-sys:Host", "conf_feh"] == CONF["exo_feh"]
+    assert exo.loc["exo-sys:Host", "feh__conf"] == 0.85
+    assert exo.loc["exo-sys:Host", "feh__tier"] == MEASURED
     far = exo.loc["exo-sys:Far"]
     assert far["feh"] == pytest.approx(modeled_feh(far["r_gal_kpc"]))
-    assert far["conf_feh"] == CONF["modeled_feh"]
+    assert far["feh__conf"] == 0.40
+    assert far["feh__tier"] == MODELED
 
 
 # ---- unified table + registry ----
@@ -188,7 +198,7 @@ def test_hazard_field_has_one_dip_per_progenitor(paths):
     center = betelgeuse[["x_gal_kpc", "y_gal_kpc", "z_gal_kpc"]].to_numpy(dtype=float)[None, :]
     assert field(center, t=0.09).logit[0] < field(center, t=-5.0).logit[0] < 0
     # weakest-link confidence: the scenario clock
-    assert field.factors[0].confidence == pytest.approx(0.9 * CONF["scenario_clock"])
+    assert field.factors[0].confidence == pytest.approx(0.9 * 0.10)
 
 
 def test_local_field_is_galactic_plus_hazards(paths):
@@ -207,3 +217,29 @@ def test_near_selects_square_patch(paths):
     picked = near(entities, sun, 0.1)
     assert "hyg:0" in set(picked["id"])
     assert (np.abs(picked["x_gal_kpc"] + R0_KPC) <= 0.1).all()
+
+
+# ---- graded provenance (ADR-011) ----
+
+def test_every_present_physical_value_has_provenance(paths):
+    entities = load_entities(paths)
+    for field in PHYSICAL_FIELDS:
+        present = entities[field].notna()
+        assert entities.loc[present, f"{field}__conf"].notna().all(), field
+        assert entities.loc[present, f"{field}__tier"].notna().all(), field
+        assert entities.loc[~present, f"{field}__conf"].isna().all(), field
+        assert entities[f"{field}__conf"].dropna().between(0, 1).all(), field
+
+
+def test_unstated_provenance_defaults_to_speculative():
+    entities = pd.DataFrame({field: [np.nan] for field in PHYSICAL_FIELDS})
+    for field in PHYSICAL_FIELDS:
+        entities[f"{field}__tier"] = None
+        entities[f"{field}__conf"] = np.nan
+    entities.loc[0, "teff_k"] = 5000.0  # a value nobody vouched for
+
+    out = enforce_provenance_default(entities)
+
+    assert out.loc[0, "teff_k__tier"] == SPECULATIVE
+    assert out.loc[0, "teff_k__conf"] == 0.10
+    assert np.isnan(out.loc[0, "mass_msun__conf"])
